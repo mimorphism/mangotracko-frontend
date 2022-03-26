@@ -20,6 +20,8 @@ const UpdateMango = () => {
            setImgHeight(this.height<580?this.height:580);
       };
     }
+
+    
     
     
     const form = useForm({
