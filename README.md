@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+A minimalistic manga tracker web application that tracks the manga you have read.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Frontend of the application in React
+
+#####################################################################################################
 
 ## Available Scripts
 
