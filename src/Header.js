@@ -11,10 +11,10 @@ return (
         </Link>
         <div className="toggle"></div>
         <ul>
-          <li><Link to="completedmango" className="link" style={{fontSize:'25px'}}>Completed
+          <li><Link to="finishedreading" className="link" style={{fontSize:'25px'}}>Finished
             <div className="bar"></div></Link>
           </li>
-          <li><Link to="ongoingmango" className="link" style={{fontSize:'25px'}}>Ongoing
+          <li><Link to="currentlyreading" className="link" style={{fontSize:'25px'}}>Currently Reading
             <div className="bar"></div></Link>
             </li>
           <li><Link to="addMango" className="link" style={{fontSize:'25px'}}>Add Mango

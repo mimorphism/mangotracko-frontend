@@ -1,9 +1,23 @@
 import Header from './Header';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import OngoingMango from './OngoingMango';
 import { MantineProvider } from '@mantine/core';
 import UpdateMango from './UpdateMango';
 import { Global } from '@mantine/core';
+import CurrentlyReading from './CurrentlyReading';
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  useQuery,
+  gql
+} from "@apollo/client";
+import FinishedReading from './FinishedReading';
+
+const client = new ApolloClient({
+  uri: 'https://graphql.anilist.co',
+  cache: new InMemoryCache()
+});
+
 
 function App() {
 
@@ -35,15 +49,17 @@ function App() {
       <Header/>
       <div className="content">
         <Switch>
-          <Route path = "/ongoingmango">
-          <OngoingMango/>
+        <ApolloProvider client={client}>
+          <Route path = "/currentlyreading">
+          <CurrentlyReading/>
           </Route>
-          <Route path = "/completedmango">
-          <OngoingMango/>
+          <Route path = "/finishedreading">
+          <FinishedReading/>
           </Route>
           <Route path = "/updatemango">
           <UpdateMango/>
           </Route>
+          </ApolloProvider>
         </Switch>
         </div>
     </div>
