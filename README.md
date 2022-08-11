@@ -1,8 +1,17 @@
-A minimalistic manga tracker web application that tracks the manga you have read.
+# Mangotracko
 
+A minimalistic manga tracker web application that tracks the manga you have read.
 Frontend of the application in React
 
-#####################################################################################################
+As usual , npm install the packages in package.json and npm start! General information about react projects below.
+
+### Built With
+
+* React [https://reactjs.org/]
+* Mantine [https://mantine.dev/]
+
+
+######################################################################################
 
 ## Available Scripts
 
@@ -70,3 +79,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
