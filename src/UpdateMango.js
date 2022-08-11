@@ -1,6 +1,10 @@
 
-import { TextInput, Button, SimpleGrid, Space, Group, Notification } from '@mantine/core';
+import {
+  NumberInput, Button, Space, Group, Paper, Center, LoadingOverlay,
+  Textarea, Tooltip, Card, Stack
+} from '@mantine/core';
 import { Image as MantineImage } from '@mantine/core';
+import { TimeInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { createStyles } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
@@ -11,163 +15,207 @@ import MangoLatestStatus from './MangoLatestStatus';
 import { formatISO, isBefore, isEqual, add } from 'date-fns';
 import dayjs from 'dayjs';
 import parseIso from 'date-fns/parseISO';
-import { axiosInstance } from './axiosInstance';
+import { resourceAxiosInstance } from './services/ResourceAxiosInstance'
 import { useHistory } from 'react-router-dom';
-import {FaCheck} from 'react-icons/fa';
+import { FaCheck, FaDatabase } from 'react-icons/fa';
+import AuthHeader from './util/authHeaderHelper';
+import TokenService from './services/TokenService';
+import { getCurrentTime, notifyOK, notifyKO } from './util/utils';
+import { useMediaQuery } from '@mantine/hooks';
+import { useElementSize } from '@mantine/hooks';
 
 
-const UpdateMango = () => {
-  const mango = useLocation().state.mango;
-  const mangoTitle =  mango.mangoTitle;
-  const mangoStatus = mango.mangoStatus;
-  const lastChapterRead = mango.ongoingMango.lastChapterRead;
-  const lastReadTime =  mango.ongoingMango.lastReadTime;
-  const bannerImg = mango.bannerImg;
 
-  const [time, setTime] = useState(new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }));
+
+const UpdateMango = ({ mango }) => {
+  const mangoTitle = mango.mango.mangoTitle;
+  const mangoStatus = mango.mango.status;
+  const lastChapterRead = mango.lastChapterRead;
+  const lastReadTime = mango.lastReadTime;
+  const bannerImg = mango.mango.bannerImg;
+  const anilistId = mango.mango.anilistId;
+  const coverImg = mango.mango.img;
+
   const [imgHeight, setImgHeight] = useState(0);
-  const [date, setDate] = useState(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingFinished, setSubmittingFinished] = useState(false);
   const history = useHistory();
+  const [finalChapter, setFinalChapter] = useState(0);
+  const [remarksMsg, setRemarksMsg] = useState("");
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const { mangoLatestStatusRef, widthMangoLatestStatus, heightMangoLatestStatus } = useElementSize();
+  const { paperContainerRef, widthPaperContainer, heightPaperContainer } = useElementSize();
 
 
-  const getImageMeta = (url) => {
-    var img = new Image();
-    img.onload = function () {
-      setImgHeight(this.height < 580 ? this.height : 580);
-    };
-    img.src = url;
-  }
+
+
 
   const form = useForm({
     initialValues: {
       title: mangoTitle,
       status: mangoStatus,
       lastChapterRead: lastChapterRead,
-      lastReadTime:lastReadTime
+      lastReadTime: lastReadTime,
+      remarks: ""
     },
     validate: {
-      lastChapterRead: (value) => (isNaN(value)?'Please input only numbers': value <=  lastChapterRead ? 
-      'Chapter must be greater than current chapter read' : null),
+      lastChapterRead: (value) => (value <= lastChapterRead ?
+        'Chapter must be greater than current chapter read' : null),
     },
   });
 
 
   const useStyles = createStyles((theme) => ({
-    div: {
-      padding: '5px 47px'
-    },
 
     Form:
     {
       backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
-      border: 'none',
-      padding: '1em',
       color: theme.colors.dark[0],
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSizes.lg,
-      borderRadius: theme.radius.lg
-    },
+      // position:'absolute',
+      // top: '50%',
+      // left: '50%',
+      // transform: 'translate(-50%, -50%)',
+      // msTransform: 'translate(-50%, -50%)',
+      [`@media (min-width: 500px)`]: {
+        // display:'flex'
 
-    notification:
-    {
-      color: theme.colors.dark[0],
-      margin: '0 auto',
-      display:'flex', 
-      justifyContent:'center', 
-      borderRadius:'0'
+      },
+
+    },
+    inputs: {
+      maxWidth: '300px',
+      width: '100%',
+      input: {
+        height: 'auto',
+      },
+
+      label: {
+        fontSize: theme.fontSizes.sm,
+      },
     }
+
 
   }));
   const { classes } = useStyles();
 
   useEffect(() => {
     if (submittingFinished) {
-      // 1000 for 1 second
-      setTimeout(() => history.push('/currentlyreading')
-      , 2000);
+      notifyOK();
+      setTimeout(() => 
+        
+        history.go(0)
+        , 1000);
     }
   }, [submittingFinished])
 
-
-  const submitMangoUpdate = (values) =>
-  {
-    setIsSubmitting(true);
-
-    const lastReadTimeDate = formatISO(parseIso(lastReadTime, new Date()), { representation: 'date' });
-    const newLastReadTimeDate = formatISO(date, { representation: 'date' });
-    let newLastReadTime = formatISO(date, { representation: 'date' })+'T'+time;
-
-    console.log(lastReadTime);
-    console.log(lastReadTimeDate);
-    console.log(newLastReadTimeDate);
-    console.log(newLastReadTime);
-
-    if(isEqual(new Date(lastReadTimeDate), new Date(newLastReadTimeDate)))
-    {
-      if(isEqual(new Date(lastReadTime), new Date(newLastReadTime)) || 
-        isBefore(new Date(newLastReadTime), new Date(lastReadTime)) )
-      {
-        newLastReadTime = add(new Date(parseIso(newLastReadTime)), {hours: 2});
-        // console.log("KLAU TARIKH SAMA WAKTU PON SAMA: "+formatISO(newLastReadTime).split(':')[0]+':'+formatISO(newLastReadTime).split(':')[1]);
-        newLastReadTime = formatISO(newLastReadTime).split(':')[0]+':'+formatISO(newLastReadTime).split(':')[1];
-      }
+  useEffect(() => {
+    if (finalChapter && finalChapter > 0
+    ) {
+      setRemarksMsg(`Optional: ${finalChapter} is the final chapter of this mango.By saving you will finish this mango.
+                You can put remarks if you wish`)
     }
+  }, [finalChapter])
 
+  const getUpdateEndpoint = (lastChapterRead, finalChapter) => {
+    return lastChapterRead == finalChapter ? '/updateMangoFinish' : 'updateMango'
+  }
+
+
+  const submitMangoUpdate = (values) => {
+    setIsSubmitting(true);
     const mangoTitleForm = values.title;
     const lastChapterReadForm = values.lastChapterRead;
+    const currentDate = new Date();
+    const newLastReadTime = formatISO(currentDate, { representation: 'date' }) + 'T' + getCurrentTime(currentDate);
 
-    const mango = 
+    const mango =
     {
       'mangoTitle': mangoTitleForm,
       'lastChapterRead': lastChapterReadForm,
-      'lastReadTime':newLastReadTime
+      'lastReadTime': newLastReadTime,
+      'user': TokenService.getUsername(),
+      'anilistId': anilistId
     }
-    console.log(mango);
+
+    if (values.remarks) {
+      mango.remarks = values.remarks;
+    }
 
     setTimeout(() => {
-      axiosInstance.put('/updateBacklog', mango)
-    .then((response) => {
-      console.log(response);
-      setIsSubmitting(false);
-      setSubmittingFinished(true);
-    }, (error) => {
-      console.log(error);
-    });
-   }, 4000)
+      resourceAxiosInstance.put(getUpdateEndpoint(lastChapterReadForm, finalChapter), mango,
+        {
+          headers: AuthHeader.getAuthHeader()
+        })
+        .then((response) => {
+          console.log(response);
+          setIsSubmitting(false);
+          setSubmittingFinished(true);
+        }, (error) => {
+          notifyKO(error.message);
+          console.log(error);
+          setIsSubmitting(false);
+          setSubmittingFinished(false);
+        });
+    }, 1000)
 
   }
   return (
-    <div>
-      <div>
-        <h1>UPDATE MANGOES</h1></div>
-      <div className={classes.div}>
-        {getImageMeta(bannerImg)}{ }
-        <MantineImage src={bannerImg} radius="xl" mt="101" height={imgHeight}></MantineImage>
-      </div>
-      <Group mt='md' position='center' direction='column'>
-        <MangoLatestStatus title={mangoTitle} currentChapter={lastChapterRead} lastReadTime={lastReadTime}></MangoLatestStatus>
-        <form style={{ width: '50%', margin: '0 auto' }} onSubmit={form.onSubmit((values) => submitMangoUpdate(values))}>
-          {!isSubmitting && !submittingFinished && <SimpleGrid cols={3} grow spacing="sm" className={classes.Form} >
-            <TextInput
-              required
-              label="Last chapter read" mb="20" size="lg"
-              {...form.getInputProps('lastChapterRead')} />
-            <DatePicker label="Last read date/time" size="lg" required mb="20" value={date} onChange={setDate} 
-            minDate={dayjs(lastReadTime).toDate()} 
-            maxDate={dayjs().toDate()}/>
-            <Form.Control className={classes.Form} type="time" value={time} onChange={(e) => setTime(e.target.value)}/>
-            <Space></Space>
-            <Button mt='-30' type="submit" >Save</Button>
-          </SimpleGrid>}
-        </form>
-        {isSubmitting && <Notification className={classes.notification} loading styles={{title:{fontSize: '30'}}}
-          title="UPDATING MANGO..." disallowClose >
-      </Notification>}
-      {submittingFinished && <Notification className={classes.notification} color='dark' icon={<FaCheck size={60}/>}  styles={{title:{fontSize: '30'}}}  disallowClose title="UPDATE SUCCESS">
-      </Notification>}
-      </Group>
+    <div
+      style={{ 
+        maxWidth: '700px',
+        }}
+      >
+      {/*position relative for form to enable LoadingOverlay to work nicely*/}
+      <form style={{ position: 'relative', margin: 0 }} onSubmit={form.onSubmit((values) => submitMangoUpdate(values))}>
+        <LoadingOverlay visible={isSubmitting} />
+      {bannerImg && !isMobile && <MantineImage withPlaceholder src={bannerImg} />}
+        {!submittingFinished &&
+          <Paper p={bannerImg && !isMobile ? 0 : "sm"} className={classes.Form}>
+            {bannerImg && !isMobile && <>
+              <Space h="md" /></>}
+            <MangoLatestStatus mango={mango} setFinalChapter={setFinalChapter} />
+            <Space h="md" />
+
+            <Center>{finalChapter != 0 ?
+              <NumberInput className={classes.inputs} min={lastChapterRead} max={finalChapter} required variant='default' label="Last chapter read" mb="20" size="lg"
+                {...form.getInputProps('lastChapterRead')} />
+              :
+              <NumberInput
+                className={classes.inputs}
+                min={lastChapterRead} required variant='default' label="Last chapter read" mb="20" size="lg"
+                {...form.getInputProps('lastChapterRead')}
+              />
+            }</Center>
+            <Center>{finalChapter != 0 && form.values['lastChapterRead'] == finalChapter && !isMobile &&
+              <Tooltip
+                label={remarksMsg}
+                position="top" placement="center" gutter={10}>
+                <Textarea
+                  className={classes.inputs}
+                  label="Remarks"
+                  maxRows={5}
+                  size='lg'
+                  variant='default'
+                  {...form.getInputProps('remarks')}
+                /></Tooltip>}</Center>
+            <Center>{finalChapter != 0 && form.values['lastChapterRead'] == finalChapter && isMobile &&
+              <Textarea
+                className={classes.inputs}
+                label="Remarks"
+                maxRows={5}
+                size='lg'
+                variant='default'
+                {...form.getInputProps('remarks')}
+              />
+            }</Center>
+
+            <Space h="md" />
+            <Center><Button size="lg" type="submit" rightIcon={<FaDatabase size={15} />}>Save</Button></Center>
+          </Paper>
+        }
+      </form>
     </div>
   );
 }
