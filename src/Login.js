@@ -84,13 +84,6 @@ const Login = () => {
                         <Space h="xl" />
                         {/* <Checkbox size={largeScreen ? 'xl' : 'md'} checked={false} label="Remember password" />
                         <Space h="xl" /> */}
-                        {type === 'register' && (
-            <Checkbox
-              label="I accept terms and conditions"
-              checked={form.values.terms}
-              onChange={(event) => form.setFieldValue('terms', event.currentTarget.checked)}
-            />
-          )}
                         <Button size={largeScreen ? 'xl' : 'md'} className={classes.controls} type="submit" >Login</Button>
                         {error && <ErrorPopup error={error.message}></ErrorPopup>}
                     </Paper>
