@@ -14,7 +14,7 @@ const useStyles = createStyles(() => ({
     content: {
         display: 'grid',
         justifyContent: 'center',
-        gridTemplateColumns: 'repeat(auto-fill, 190px)',
+        gridTemplateColumns: 'repeat(auto-fit, 190px)',
         padding: '2rem 2rem',
         gap: '5em 5em',
         overflow:'auto',
