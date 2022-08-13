@@ -74,8 +74,6 @@ function App() {
   const matchesMobileView = useMediaQuery('(min-width: 1024px)');
 
 
-
-
   useEffect(() => {
     if (localStorage.getItem('user')) {
       dispatch({ type: 'LOGGED_IN', value: JSON.parse(localStorage.getItem('user')).user });
