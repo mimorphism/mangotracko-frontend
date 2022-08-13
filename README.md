@@ -9,6 +9,8 @@ As usual , npm install the packages in package.json and npm start! General infor
 
 * React [https://reactjs.org/]
 * Mantine [https://mantine.dev/]
+* Axios [https://axios-http.com/]
+* Apollo GraphQL[https://www.apollographql.com/]
 
 
 ######################################################################################
