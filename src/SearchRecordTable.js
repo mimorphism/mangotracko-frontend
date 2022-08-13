@@ -212,7 +212,7 @@ export function SearchRecordTable({ rawData, input }) {
             rows
           ) : (
             <tr>
-              <td colSpan={Object.keys(data[0]).length}>
+              <td colSpan='md'>
                 <Text weight={800} align="center">
                   Nothing found
                 </Text>

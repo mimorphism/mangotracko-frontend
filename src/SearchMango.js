@@ -1,5 +1,5 @@
 import {
-  Center, Space, Stack, SegmentedControl, TextInput, createStyles,
+  Center, Space, LoadingOverlay, SegmentedControl, TextInput, createStyles,
   Grid, SimpleGrid, Modal
 } from "@mantine/core";
 import { useState, useEffect, useRef } from 'react';
@@ -226,6 +226,11 @@ useEffect(() => {
 
 return (
   <div className={classes.container}>
+  <LoadingOverlay
+                loaderProps={{
+                    size: '200', variant: 'bars'
+
+                }} visible={isPending} />
     <>
       <div style={{ display: 'sticky' }}>
         <Center className={classes.searchBarContainer}>
