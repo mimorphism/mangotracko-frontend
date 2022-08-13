@@ -21,8 +21,18 @@ export const notifyOK = () => {
 
 }
 
+export const notifyOKCustom = (title, message) => {
+    return showNotification({ title: title , message: message });
+
+}
+
 export const notifyKO = (message) => {
     return showNotification({ color: 'red', title: 'Oops, something went wrong!' , message: message});
+
+}
+
+export const notifyKOCustom = (title, message) => {
+    return showNotification({ color: 'red', title: title , message: message});
 
 }
 
