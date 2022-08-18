@@ -9,12 +9,11 @@ const register = (username, password) => {
       headers:{"Content-Type": "application/json"}
     })
     .then((response) => {
-      if (response === 'Registration is succesful!') {
-         notifyOKCustom('Registration succesful!', 'Please login with your credentials');
-      }
+      console.log(response);
+         notifyOKCustom(response.data.message, 'You can now login');
     }).catch((error) => {
       console.log(error);
-       notifyKOCustom('Registration failed!: ' + error.message);
+       notifyKOCustom('Registration failed!', error.message);
     });
 };
 
