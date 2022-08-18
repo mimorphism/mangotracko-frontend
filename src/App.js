@@ -17,6 +17,7 @@ import { Helmet } from "react-helmet";
 import { NotificationsProvider } from '@mantine/notifications';
 import GlobalStyles from './GlobalStyles';
 import { useMediaQuery } from '@mantine/hooks';
+import { PageNotFound } from './PageNotFound';
 
 
 
@@ -100,8 +101,8 @@ function App() {
               {!state.loggedin ? <Login /> : <>
                 <Header username={state.username} />
                 <ScrollArea offsetScrollbars scrollbarSize={4} className={classes.content}>
+                <ApolloProvider client={apolloClientInstance}>
                   <Switch>
-                    <ApolloProvider client={apolloClientInstance}>
                       <Route exact path="/currentlyreading">
                         <CurrentlyReading />
                       </Route>
@@ -117,8 +118,11 @@ function App() {
                       <Route exact path="/backlog">
                         <Backlog />
                       </Route>
-                    </ApolloProvider>
+                    <Route path="*">
+                    <PageNotFound/>
+                    </Route>
                   </Switch>
+                </ApolloProvider>
                 </ScrollArea>
             {matchesMobileView && <Footer/>}
             </>}
