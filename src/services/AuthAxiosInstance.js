@@ -3,7 +3,8 @@ import AuthHeader from '../util/authHeaderHelper';
 import TokenService from './TokenService';
 
 // export const baseUrl = "http://localhost:8080";
-export const baseUrl = "http://192.168.0.2:8080";
+// export const baseUrl = "http://192.168.0.2:8080";
+export const baseUrl = process.env.REACT_APP_BACKEND_BASE_URL;
 
 
 const authAxiosInstance = axios.create({

@@ -5,7 +5,10 @@ import history from '../history';
 import AuthService from './AuthService';
 
 // export const baseUrl = "http://localhost:8080/api/user";
-export const baseUrl = "http://192.168.0.2:8080/api/user";
+// export const baseUrl = "http://192.168.0.2:8080/api/user";
+export const baseUrl = process.env.REACT_APP_BACKEND_BASE_URL+'/api/user';
+
+
 
 
 const resourceAxiosInstance = axios.create({
