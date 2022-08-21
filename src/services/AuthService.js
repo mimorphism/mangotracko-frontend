@@ -1,7 +1,7 @@
 import { authAxiosInstance } from './AuthAxiosInstance';
 import TokenService from './TokenService';
 import AuthHeader from '../util/authHeaderHelper';
-import { notifyOKCustom,notifyKOCustom } from '../util/utils';
+import { notifyOKCustom,notifyKOCustom, notifyLoading } from '../util/utils';
 
 const register = (username, password) => {
   return authAxiosInstance
@@ -18,6 +18,7 @@ const register = (username, password) => {
 };
 
 const login = (username, password) => {
+  notifyLoading('Logging you in...');
   return authAxiosInstance
     .post('/api/auth/login', {"username": username,"password": password}, {
       // auth:{'username': username,'password: password},
@@ -37,6 +38,7 @@ const login = (username, password) => {
 
 
 const logout = () => {
+    notifyLoading('Logging you out...');
   const username = TokenService.getUsername();
   const accessToken = AuthHeader.getAuthHeaderForLogout();
   const refreshToken = AuthHeader.getRefreshTokenHeaderForLogout();
@@ -48,9 +50,6 @@ const logout = () => {
         Authorization:accessToken,
         Refresher:refreshToken
       }
-    })
-    .then((response) => {
-      return response.data;
     });
 };
 

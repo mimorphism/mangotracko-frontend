@@ -41,6 +41,10 @@ export const notifyAlert = (message) => {
 
 }
 
+export const notifyLoading = (message) => {
+    return showNotification({ loading:true, title: 'Please wait' , message: message});
+
+}
 export function getPrettifiedDate(date) {
   const newDate = parseIso(date, new Date());
   return format(newDate, 'LLL d yyyy p');
