@@ -89,7 +89,7 @@ function App() {
     }
     }
     >
-      <NotificationsProvider autoClose={4000}>
+      <NotificationsProvider autoClose={4000} limit={1}>
         <GlobalStyles />
         <Helmet>
           <title>MangoTracko</title>
@@ -115,7 +115,7 @@ function App() {
                       <Route exact path="/addmango">
                         <SearchMango />
                       </Route>
-                      <Route exact path="/backlog">
+                      <Route exact path={["/backlog", "/"]}>
                         <Backlog />
                       </Route>
                     <Route path="*">
