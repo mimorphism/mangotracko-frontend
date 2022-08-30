@@ -5,7 +5,7 @@ import { LoadingOverlay } from '@mantine/core';
 import { formatDistance } from 'date-fns'
 import parseIso from 'date-fns/parseISO';
 import { useState, useEffect } from 'react';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance';
+import { resourceAxiosInstance } from './services/AxiosService';
 import AuthHeader from './util/authHeaderHelper';
 
 
@@ -78,7 +78,7 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
     if (data) {
       setFinalChapter(data.Media.chapters)
       if (mango.mango.lastChapter == null && data.Media.chapters != null) {
-        resourceAxiosInstance.put('/updateMangoStatus', anilistId,
+        resourceAxiosInstance.service.put('/updateMangoStatus', anilistId,
           {
             headers: AuthHeader.getAuthHeader()
           })

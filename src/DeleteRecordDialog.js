@@ -2,7 +2,7 @@ import { Paper, Text, Button, Center, Space, createStyles,LoadingOverlay } from 
 import { FaDatabase, } from 'react-icons/fa';
 import { useState, useEffect, Fragment } from 'react';
 import TokenService from './services/TokenService';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance'
+import { resourceAxiosInstance } from './services/AxiosService';
 import AuthHeader from './util/authHeaderHelper';
 import { useHistory } from 'react-router-dom';
 import { notifyOK, notifyKO} from './util/utils';
@@ -39,7 +39,7 @@ const DeleteRecordDialog = ({recordType, recordId}) => {
         }
 
         setTimeout(() => {
-            resourceAxiosInstance.put('/deleteRecord', mango,
+            resourceAxiosInstance.service.put('/deleteRecord', mango,
                 {
                     headers: AuthHeader.getAuthHeader()
                 })

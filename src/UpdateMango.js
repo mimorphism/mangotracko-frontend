@@ -13,9 +13,7 @@ import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import MangoLatestStatus from './MangoLatestStatus';
 import { formatISO, isBefore, isEqual, add } from 'date-fns';
-import dayjs from 'dayjs';
-import parseIso from 'date-fns/parseISO';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance'
+import { resourceAxiosInstance } from './services/AxiosService';
 import { useHistory } from 'react-router-dom';
 import { FaCheck, FaDatabase } from 'react-icons/fa';
 import AuthHeader from './util/authHeaderHelper';
@@ -144,7 +142,7 @@ const UpdateMango = ({ mango }) => {
     }
 
     setTimeout(() => {
-      resourceAxiosInstance.put(getUpdateEndpoint(lastChapterReadForm, finalChapter), mango,
+      resourceAxiosInstance.service.put(getUpdateEndpoint(lastChapterReadForm, finalChapter), mango,
         {
           headers: AuthHeader.getAuthHeader()
         })

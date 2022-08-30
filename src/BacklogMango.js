@@ -9,7 +9,7 @@ import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { formatISO } from 'date-fns';
 import { useState, useEffect } from 'react';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance'
+import { resourceAxiosInstance } from './services/AxiosService';
 import AuthHeader from './util/authHeaderHelper';
 import TokenService from './services/TokenService';
 import { FaCheck } from 'react-icons/fa';
@@ -109,7 +109,7 @@ const BacklogMango = ({ mango }) => {
         console.log(mango);
 
         setTimeout(() => {
-            resourceAxiosInstance.put('/updateMango', mango,
+            resourceAxiosInstance.service.put('/updateMango', mango,
                 {
                     headers: AuthHeader.getAuthHeader()
                 })
