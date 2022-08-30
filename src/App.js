@@ -18,6 +18,8 @@ import { NotificationsProvider } from '@mantine/notifications';
 import GlobalStyles from './GlobalStyles';
 import { useMediaQuery } from '@mantine/hooks';
 import { PageNotFound } from './PageNotFound';
+import Home from './Home';
+import { AxiosInterceptor } from './services/AxiosService';
 
 
 
@@ -28,6 +30,8 @@ function App() {
   const initialState =
   {
     loggedin: false,
+    loggedOutByAnotherSession: false,
+    loggedOutSessionExpired:false,
     username: ""
   }
 
@@ -37,6 +41,10 @@ function App() {
         return { loggedin: true, username: action.value };
       case "LOGGED_OUT":
         return { loggedin: false, username: "" }
+      case "LOGGED_OUT_BY_ANOTHER_SESSION":
+        return { loggedin: false, username: "", loggedOutByAnotherSession: true,loggedOutSessionExpired:false }
+      case "LOGGED_OUT_SESSION_EXPIRED":
+        return { loggedin: false, username: "", loggedOutSessionExpired: false,loggedOutSessionExpired:false }
       default:
         return initialState;
     }
@@ -49,7 +57,7 @@ function App() {
 
   const useStyles = createStyles(() => ({
     content: {
-      flex:'1 1 auto',
+      flex: '1 1 auto',
       maxWidth: '1440px',
       width: `calc(100vw - 20vw)`,
       height: 'calc(100vh - 18vh)',
@@ -63,9 +71,9 @@ function App() {
 
     main: {
       // overflow: 'hidden',
-      display:'flex',
-      flexDirection:'column',
-      height:'100%',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
     }
 
   }
@@ -98,35 +106,40 @@ function App() {
         <Router history={history}>
           <div className={!state.loggedin ? "main" : classes.main}>
             <UserContext.Provider value={{ state, dispatch }}>
-              {!state.loggedin ? <Login /> : <>
-                <Header username={state.username} />
-                <ScrollArea offsetScrollbars scrollbarSize={4} className={classes.content}>
-                <ApolloProvider client={apolloClientInstance}>
-                  <Switch>
-                      <Route exact path="/currentlyreading">
-                        <CurrentlyReading />
-                      </Route>
-                      <Route exact path="/finished">
-                        <FinishedReading />
-                      </Route>
-                      <Route exact path="/updatemango">
-                        <UpdateMango />
-                      </Route>
-                      <Route exact path="/addmango">
-                        <SearchMango />
-                      </Route>
-                      <Route exact path={["/backlog", "/"]}>
-                        <Backlog />
-                      </Route>
-                    <Route path="*">
-                    <PageNotFound/>
-                    </Route>
-                  </Switch>
-                </ApolloProvider>
-                </ScrollArea>
-            {matchesMobileView && <Footer/>}
-            </>}
-          </UserContext.Provider>
+              <AxiosInterceptor>
+                {!state.loggedin ? <Login /> : <>
+                  <Header username={state.username} />
+                  <ScrollArea offsetScrollbars scrollbarSize={4} className={classes.content}>
+                    <ApolloProvider client={apolloClientInstance}>
+                      <Switch>
+                        <Route exact path={["/home", "/"]}>
+                          <Home />
+                        </Route>
+                        <Route exact path="/currentlyreading">
+                          <CurrentlyReading />
+                        </Route>
+                        <Route exact path="/finished">
+                          <FinishedReading />
+                        </Route>
+                        <Route exact path="/updatemango">
+                          <UpdateMango />
+                        </Route>
+                        <Route exact path="/addmango">
+                          <SearchMango />
+                        </Route>
+                        <Route exact path="/backlog">
+                          <Backlog />
+                        </Route>
+                        <Route path="*">
+                          <PageNotFound />
+                        </Route>
+                      </Switch>
+                    </ApolloProvider>
+                  </ScrollArea>
+                  {matchesMobileView && <Footer />}
+                </>}
+              </AxiosInterceptor>
+            </UserContext.Provider>
           </div>
         </Router>
       </NotificationsProvider>
