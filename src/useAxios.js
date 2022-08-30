@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AuthHeader from './util/authHeaderHelper';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance';
+import { resourceAxiosInstance } from './services/AxiosService';
 import { notifyKO, notifyAlert } from './util/utils';
 
 
@@ -17,7 +17,7 @@ const useAxios = (url) => {
   useEffect(() => {
     const abortCont = new AbortController();
 
-    resourceAxiosInstance.get(url, {
+    resourceAxiosInstance.service.get(url, {
       signal: abortCont.signal,
       headers: AuthHeader.getAuthHeader()
     })
