@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { formatISO } from 'date-fns';
 import { useForm } from '@mantine/form';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance'
+import { resourceAxiosInstance } from './services/AxiosService';
 import { useHistory } from 'react-router-dom';
 import AuthHeader from './util/authHeaderHelper';
 import TokenService from './services/TokenService';
@@ -104,7 +104,7 @@ const AddMangoForm = ({ mango, setFormVisible }) => {
         }
 
         setTimeout(() => {
-            resourceAxiosInstance.post(endpoint, mango,
+            resourceAxiosInstance.service.post(endpoint, mango,
                 {
                     headers: AuthHeader.getAuthHeader()
                 })
@@ -167,7 +167,9 @@ const AddMangoForm = ({ mango, setFormVisible }) => {
                                     placeholder="Chapter" radius={0} required size='md' min={1} />
                             </Tooltip>
                             <Tooltip label="Last read date" position="bottom" placement="center" gutter={10}>
+                            <div>
                                 <DatePicker clearable={false} radius={0} value={date} placeholder='Last read date' size="md" required onChange={setDate} />
+                                </div>
                             </Tooltip>
                             <TimeInput value={time} onChange={setTime} size="md" radius={0} format="12" defaultValue={new Date()} />
                         </Group>
@@ -178,8 +180,10 @@ const AddMangoForm = ({ mango, setFormVisible }) => {
                         <Group className='btnGroup' grow={!isMobile} position='center' noWrap="true" spacing={0}>
                             <TextInput placeholder="Remarks" size="md" value={remarks} onClick={() => setRemarksModalVisible(true)}></TextInput>
                             <Tooltip label="Finished date" position="bottom" placement="center" gutter={10}>
+                            <div>
                                 <DatePicker clearable={false} radius={0} value={date} placeholder='Finished date' size="md" required
                                     onChange={setDate} />
+                                    </div>
                             </Tooltip>
                             <TimeInput value={time} onChange={setTime} size="md" radius={0} format="12" defaultValue={new Date()} />
                         </Group>
