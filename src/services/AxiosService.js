@@ -38,7 +38,7 @@ const AxiosInterceptor = ({ children }) => {
             const errorMsg = error.response ? error.response.data.message : null;
             if (statusCode === 401) {
 
-                this.service
+                resourceAxiosInstance.service
                     .get('/refreshtoken', {
                         headers: AuthHeader.getRefreshTokenHeader()
                     })
@@ -50,10 +50,13 @@ const AxiosInterceptor = ({ children }) => {
                         }
                     }).catch((response) => {
                         if (response.errorCode == 500) {
-                            AuthService.logout();
+                            dispatch({ type: 'LOGGED_OUT_SESSION_EXPIRED'});
+                            TokenService.removeUser();
                             history.push('/login');
                         };
                     });
+                return new Promise(() => {});
+
             }
 
 
@@ -76,13 +79,13 @@ const AxiosInterceptor = ({ children }) => {
 
             if (statusCode === 400) {
                 return Promise.reject({
-                    message: error.response.data.message,
+                    message: errorMsg,
                 });
             }
 
             if (statusCode === 404) {
                 return Promise.reject({
-                    message: error.response.data.message,
+                    message: errorMsg,
                 });
             }
 
@@ -94,7 +97,7 @@ const AxiosInterceptor = ({ children }) => {
         return () => resourceAxiosInstance.service.interceptors.response.eject(interceptor);
 
 
-    }, [state])
+    }, [])
     return children;
 }
 
