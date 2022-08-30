@@ -1,6 +1,6 @@
 import {
   Center, Space, LoadingOverlay, SegmentedControl, TextInput, createStyles,
-  Grid, SimpleGrid, Modal
+  Grid, UnstyledButton, Modal
 } from "@mantine/core";
 import { useState, useEffect, useRef } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
@@ -11,6 +11,8 @@ import { useToggle } from '@mantine/hooks';
 import { useMediaQuery } from '@mantine/hooks';
 import useAxios from './useAxios';
 import { SearchRecordTable } from "./SearchRecordTable";
+import {FaCog} from 'react-icons/fa';
+import SearchSettings from "./SearchSettings";
 
 
 
@@ -34,6 +36,9 @@ const SearchMango = () => {
   const RECORDS = 'RECORDS';
   const NEW_MANGO = 'NEW MANGO';
   const [searchType, setSearchType] = useToggle([RECORDS, NEW_MANGO]);
+  const [isAdult, setIsAdult] = useState(false);
+  const [searchSettingsVisible, setSearchSettingsVisible] = useState(false);
+
 
 
   const useStyles = createStyles(((theme, _params) => ({
@@ -142,9 +147,9 @@ function destructureExistingRecordsToAnilistId(searchResult) {
 
 
 const GET_MANGO_SUGGESTIONS = gql`
-    query($title: String!, $mangoFilter:[Int]){
+    query($title: String!, $mangoFilter:[Int], $isAdult:Boolean){
         Page(perPage: 20) {
-          media(search:$title, format: MANGA, isAdult:false, id_not_in:$mangoFilter) {
+          media(search:$title, format: MANGA, isAdult:$isAdult, id_not_in:$mangoFilter) {
             title {
               romaji
             }
@@ -168,10 +173,8 @@ const GET_MANGO_SUGGESTIONS = gql`
 const [getSuggestions, { loading, error, data }] = useLazyQuery(GET_MANGO_SUGGESTIONS,
   {
     onCompleted: (data) => {
-      console.log("result avalaible onCompleted")
     },
     onError: (error) => {
-      console.log("result avalaible: false")
       setQueryError(error);
     }
   });
@@ -181,16 +184,13 @@ useEffect(() => {
   if (isMounted.current) {
     if (typeof debounced != 'undefined'
       && debounced !== '' && searchType === NEW_MANGO) {
-      // console.log("start of cycle!");
-      // console.log("mangosearch triggered: " + debounced);
-      console.log(existingRecords);
-      getSuggestions({ variables: { title: debounced, mangoFilter: destructureExistingRecordsToAnilistId(existingRecords) } });
+      getSuggestions({ variables: { title: debounced, isAdult:isAdult, mangoFilter: destructureExistingRecordsToAnilistId(existingRecords) } });
     }
     // }
   } else {
     isMounted.current = true;
   }
-}, [debounced, searchType])
+}, [debounced, searchType, isAdult])
 
 
 
@@ -205,11 +205,8 @@ useEffect(() => {
   if (!data) {
     setMangoSuggestions(prev => []);
   } else {
-    console.log("result available in useeffect for resultavailable: " + resultAvailableRef.current)
     setMangoSuggestions(prev => [...destructureSearchResult(data)]);
     resultAvailableRef.current = false;
-    console.log("end of cycle!")
-    console.log(data);
   }
 }, [data])
 
@@ -238,7 +235,9 @@ return (
             radius={0}
             value={input} size={matchesMobileView ? "lg" : "md"}
             placeholder="Search mango"
-            onChange={(event) => setInput(event.currentTarget.value)} />
+            onChange={(event) => setInput(event.currentTarget.value)} 
+            rightSection={searchType === NEW_MANGO && <UnstyledButton onClick={()=>setSearchSettingsVisible(true)}><FaCog color="white"/></UnstyledButton>}
+            />
           <SegmentedControl
             onChange={setSearchType}
             size="sm"
@@ -253,6 +252,8 @@ return (
       {/*Section for new mango search*/}
         {input !== '' && searchType === NEW_MANGO && 
           <div className={classes.newMangoContent}>
+                  {isAdult}
+
             {mangoSuggestions &&
               mangoSuggestions.map(mango => (
 
@@ -273,7 +274,10 @@ return (
     <Modal size="lg" withCloseButton={false} centered opened={formVisible} onClose={() => setFormVisible(false)}
       padding={0} closeOnClickOutside>
       <AddNewMango mango={getMangoFromSearchResults(mango)} setFormVisible={setFormVisible}></AddNewMango>
-
+    </Modal>
+    <Modal size="lg" withCloseButton={false} centered opened={searchSettingsVisible} onClose={() => setSearchSettingsVisible(false)}
+      padding={0} closeOnClickOutside>
+      <SearchSettings isAdult={isAdult} setIsAdult={setIsAdult}/>
     </Modal>
   </div>
   // </Stack>
