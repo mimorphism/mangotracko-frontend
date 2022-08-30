@@ -96,8 +96,6 @@ const data = [
 
 const GeneralStats = ({stats}) => {
     const { classes,cx } = useStyles();
-    console.log(stats);
-
     function IndividualGroup({ title, stat }) {
         return (
             <div key={title+stat} className={classes.stat}>
