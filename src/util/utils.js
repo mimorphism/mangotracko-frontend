@@ -1,4 +1,4 @@
-import { showNotification } from '@mantine/notifications';
+import { showNotification, updateNotification, hideNotification} from '@mantine/notifications';
 import parseIso from 'date-fns/parseISO';
 import format from 'date-fns/format';
 
@@ -41,10 +41,19 @@ export const notifyAlert = (message) => {
 
 }
 
-export const notifyLoading = (message) => {
-    return showNotification({ loading:true, title: 'Please wait' , message: message});
-
+export const notifyLoading = (message, id) => {
+    return showNotification({ id:id, loading:true, title: 'Please wait' , message: message, autoClose:false});
 }
+
+export const notifyLoadingCallback = (message, id, title, isFailed) => {
+    return updateNotification({ id:id, title: title , message: message, color:isFailed&&'red' });
+}
+
+export const notifyRemove = (id) => {
+    return hideNotification(id);
+}
+
+
 export function getPrettifiedDate(date) {
   const newDate = parseIso(date, new Date());
   return format(newDate, 'LLL d yyyy p');
