@@ -4,7 +4,6 @@ import {
   Textarea, Tooltip, SegmentedControl, Divider, Text, Checkbox
 } from '@mantine/core';
 import { Image as MantineImage } from '@mantine/core';
-import { TimeInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { createStyles } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
@@ -116,8 +115,8 @@ const UpdateMango = ({ mango }) => {
     }
   }, [finalChapter])
 
-  const getUpdateEndpoint = (lastChapterRead, finalChapter) => {
-    return lastChapterRead == finalChapter ? '/updateMangoFinish' : 'updateMango'
+  const getUpdateEndpoint = () => {
+    return markAsFinished ? '/updateMangoFinish' : 'updateMango'
   }
 
 
@@ -142,7 +141,7 @@ const UpdateMango = ({ mango }) => {
     }
 
     setTimeout(() => {
-      resourceAxiosInstance.service.put(getUpdateEndpoint(lastChapterReadForm, finalChapter), mango,
+      resourceAxiosInstance.service.put(getUpdateEndpoint(), mango,
         {
           headers: AuthHeader.getAuthHeader()
         })
