@@ -1,7 +1,7 @@
 
 import {
-  NumberInput, Button, Space, Group, Paper, Center, LoadingOverlay,
-  Textarea, Tooltip, Card, Stack
+  NumberInput, Button, Space, Paper, Center, LoadingOverlay,
+  Textarea, Tooltip, SegmentedControl, Divider, Text, Checkbox
 } from '@mantine/core';
 import { Image as MantineImage } from '@mantine/core';
 import { TimeInput } from '@mantine/dates';
@@ -32,17 +32,17 @@ const UpdateMango = ({ mango }) => {
   const lastReadTime = mango.lastReadTime;
   const bannerImg = mango.mango.bannerImg;
   const anilistId = mango.mango.anilistId;
-  const coverImg = mango.mango.img;
 
-  const [imgHeight, setImgHeight] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingFinished, setSubmittingFinished] = useState(false);
   const history = useHistory();
   const [finalChapter, setFinalChapter] = useState(0);
   const [remarksMsg, setRemarksMsg] = useState("");
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const { mangoLatestStatusRef, widthMangoLatestStatus, heightMangoLatestStatus } = useElementSize();
-  const { paperContainerRef, widthPaperContainer, heightPaperContainer } = useElementSize();
+  const INFO = "INFO";
+  const UPDATE = "UPDATE";
+  const [tab, setTab] = useState(INFO);
+  const [markAsFinished, setMarkAsFinished] = useState(false);
 
 
 
@@ -101,8 +101,8 @@ const UpdateMango = ({ mango }) => {
   useEffect(() => {
     if (submittingFinished) {
       notifyOK();
-      setTimeout(() => 
-        
+      setTimeout(() =>
+
         history.go(0)
         , 1000);
     }
@@ -159,58 +159,98 @@ const UpdateMango = ({ mango }) => {
     }, 1000)
 
   }
+
   return (
     <div
-      style={{ 
+      style={{
         maxWidth: '700px',
-        }}
-      >
+      }}
+    >
       {/*position relative for form to enable LoadingOverlay to work nicely*/}
       <form style={{ position: 'relative', margin: 0 }} onSubmit={form.onSubmit((values) => submitMangoUpdate(values))}>
         <LoadingOverlay visible={isSubmitting} />
-      {bannerImg && !isMobile && <MantineImage withPlaceholder src={bannerImg} />}
+        {bannerImg && !isMobile && <MantineImage withPlaceholder src={bannerImg} />}
         {!submittingFinished &&
           <Paper p={bannerImg && !isMobile ? 0 : "sm"} className={classes.Form}>
             {bannerImg && !isMobile && <>
               <Space h="md" /></>}
-            <MangoLatestStatus mango={mango} setFinalChapter={setFinalChapter} />
-            <Space h="md" />
+            <Center>
+              <SegmentedControl
+                radius='xs'
+                color='blue'
+                value={tab}
+                onChange={setTab}
+                size="sm"
+                data={[
+                  {
+                    label: (<Text
+                      weight={800}
+                      size="xs">
+                      INFO
+                    </Text>), value: INFO
+                  },
+                  {
+                    label: (<Text
+                      weight={800}
+                      size="xs">
+                      UPDATE
+                    </Text>), value: UPDATE
+                  },
+                ]}
+              />
+            </Center>
 
-            <Center>{finalChapter != 0 ?
-              <NumberInput className={classes.inputs} min={lastChapterRead} max={finalChapter} required variant='default' label="Last chapter read" mb="20" size="lg"
+            <Divider my="sm" />
+
+
+            {tab === UPDATE && <><Center>
+              <NumberInput className={classes.inputs} min={lastChapterRead} max={!finalChapter ? lastChapterRead + 1000 : finalChapter} required variant='default' label="Last chapter read" mb="20" size="md"
                 {...form.getInputProps('lastChapterRead')} />
-              :
-              <NumberInput
-                className={classes.inputs}
-                min={lastChapterRead} required variant='default' label="Last chapter read" mb="20" size="lg"
-                {...form.getInputProps('lastChapterRead')}
-              />
-            }</Center>
-            <Center>{finalChapter != 0 && form.values['lastChapterRead'] == finalChapter && !isMobile &&
-              <Tooltip
-                label={remarksMsg}
-                position="top" placement="center" gutter={10}>
-                <Textarea
-                  className={classes.inputs}
-                  label="Remarks"
-                  maxRows={5}
-                  size='lg'
-                  variant='default'
-                  {...form.getInputProps('remarks')}
-                /></Tooltip>}</Center>
-            <Center>{finalChapter != 0 && form.values['lastChapterRead'] == finalChapter && isMobile &&
-              <Textarea
-                className={classes.inputs}
-                label="Remarks"
-                maxRows={5}
-                size='lg'
-                variant='default'
-                {...form.getInputProps('remarks')}
-              />
-            }</Center>
+            </Center>
+              <Center>{finalChapter != 0 && form.values['lastChapterRead'] == finalChapter && !isMobile &&
+                <Tooltip
+                  label={remarksMsg}
+                  position="top" placement="center" gutter={10}>
+                  <Textarea
+                    className={classes.inputs}
+                    label="Remarks"
+                    maxRows={5}
+                    size='lg'
+                    variant='default'
+                    {...form.getInputProps('remarks')}
+                  /></Tooltip>}
+              </Center>
+              <Center>
+                {markAsFinished &&
+                  <Textarea
+                    className={classes.inputs}
+                    label="Remarks"
+                    maxRows={5}
+                    size='lg'
+                    variant='default'
+                    {...form.getInputProps('remarks')}
+                  />
+                }</Center>
+              <Space h="md" />
 
-            <Space h="md" />
-            <Center><Button size="lg" type="submit" rightIcon={<FaDatabase size={15} />}>Save</Button></Center>
+              <Center>
+                <Checkbox
+                  checked={markAsFinished}
+                  onChange={(event) => setMarkAsFinished(event.currentTarget.checked)}
+                  label="Mark as finished"
+                /></Center>
+              <Space h="md" />
+              <Center><Button size="sm" type="submit" rightIcon={<FaDatabase size={15} />}>SAVE</Button></Center>
+            </>
+            }
+            {tab === INFO &&
+              <>
+                <MangoLatestStatus mango={mango} setFinalChapter={setFinalChapter} />
+                <Space h="md" />
+              </>
+            }
+
+
           </Paper>
         }
       </form>
