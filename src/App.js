@@ -32,6 +32,7 @@ function App() {
     loggedin: false,
     loggedOutByAnotherSession: false,
     loggedOutSessionExpired:false,
+    loggedOutServerUnreachable:false,
     username: ""
   }
 
@@ -42,9 +43,11 @@ function App() {
       case "LOGGED_OUT":
         return { loggedin: false, username: "" }
       case "LOGGED_OUT_BY_ANOTHER_SESSION":
-        return { loggedin: false, username: "", loggedOutByAnotherSession: true,loggedOutSessionExpired:false }
+        return { loggedin: false, username: "", loggedOutByAnotherSession: true }
       case "LOGGED_OUT_SESSION_EXPIRED":
-        return { loggedin: false, username: "", loggedOutSessionExpired: false,loggedOutSessionExpired:false }
+        return { loggedin: false, username: "", loggedOutSessionExpired: true }
+      case "LOGGED_OUT_SERVER_UNREACHABLE":
+        return { loggedin: false, username: "", loggedOutServerUnreachable:true }
       default:
         return initialState;
     }
@@ -124,7 +127,7 @@ function App() {
                         <Route exact path="/updatemango">
                           <UpdateMango />
                         </Route>
-                        <Route exact path="/addmango">
+                        <Route exact path="/search">
                           <SearchMango />
                         </Route>
                         <Route exact path="/backlog">
