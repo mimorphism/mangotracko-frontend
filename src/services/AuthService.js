@@ -8,7 +8,7 @@ import history from '../history';
 const register = (username, password) => {
   notifyLoading('Registering your account...', 'register');
   return authAxiosInstance.service
-    .post('/auth/registration', {"username": username,"password": password}, {
+    .post('/api/auth/registration', {"username": username,"password": password}, {
       headers:{"Content-Type": "application/json"}
     })
     .then((response) => {
@@ -36,7 +36,11 @@ const login = (username, password) => {
       }
       return response.data;
     }).catch((error) => {
+      if(error.response != undefined){
        notifyLoadingCallback(error.response.data.message, 'login','Login failed!', true );
+      }else{
+        notifyLoadingCallback('Server cannot be reached!', 'login','Login failed!', true );
+      }
        return new Promise(() => {});
     });
 };
