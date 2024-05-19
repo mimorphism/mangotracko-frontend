@@ -7,6 +7,9 @@ import { useState } from 'react';
 import DeleteRecordDialog from './DeleteRecordDialog';
 import { RecordType } from './util/utils';
 import { getPrettifiedDate } from './util/utils';
+import { useMediaQuery } from '@mantine/hooks';
+import UpdateMango from './UpdateMango';
+
 
 
 const FinishedMango = ({ mango }) => {
@@ -21,84 +24,59 @@ const FinishedMango = ({ mango }) => {
       fontWeight: '700',
       cursor: 'pointer'
     },
-    btnGroup:{
+    btnGroup: {
       [`@media (max-width: 1024px)`]: {
-          flexDirection:'column'
+        flexDirection: 'column'
 
       },
     },
-    optionBtn:{
-      fontSize:theme.fontSizes.xs,
-      width:'100%'
+    optionBtn: {
+      fontSize: theme.fontSizes.xs,
+      width: '100%'
     },
-    
+
   }
   ));
 
   const { classes } = useStyles();
-  const [valueInfo, setToggleInfo] = useToggle(['gray', 'dark']);
-  const [valueRemarks, setToggleRemarks] = useToggle(['gray', 'dark']);
   const [isDeleteRecordDiagOpen, setDeleteRecordDiagOpen] = useState(false);
+  const [isUpdateMangoDiagOpen, setUpdateMangoDiagOpen] = useState(false);
+  const matchesSmallMobileView = useMediaQuery('(max-width: 500px)');
 
 
 
   return (
 
-    <div>
+    <div className='mainDiv'>
       <Indicator label="X"
         classNames={{ indicator: classes.indicator }}
-        onClick={()=> setDeleteRecordDiagOpen(true)}
+        onClick={() => setDeleteRecordDiagOpen(true)}
         color="dark" size={20} withBorder>
       </Indicator>
       <Card
         shadow="sm">
-        <Card.Section>
+        <Card.Section onClick={() => setUpdateMangoDiagOpen(true)}>
           <Image src={mango.mango.img} withPlaceholder />
         </Card.Section>
         <Space h="xs"></Space>
-        {valueInfo === 'gray' ?
-          <Fragment>
-            <Text
-              weight={800}
-              size="sm"
-              align="center">
-              {mango.mango.mangoTitle}
-            </Text>
-          </Fragment>
-          :
-          
-          <Fragment>
-            <Text className={classes.standardFont}
-              size="sm"
-              align="left"
-              weight={800}>
-              AUTHOR:<Space/>{mango.mango.author}
-            </Text>
-            <Space h="xs"></Space>
-            <Text
-              className={classes.standardFont}
-              weight={800}
-              size="sm"
-              align="left">
-              FINISHED ON:<Space/>{getPrettifiedDate(mango.completionDateTime)}
-            </Text>
-          </Fragment>
-        }
-        {valueRemarks === 'dark' &&
-          <Modal opened={valueRemarks} size="xl" onClose={() => setToggleRemarks('gray')} centered withCloseButton={false}>
-            {mango.remarks ? mango.remarks : 'No remarks'}
-        </Modal>}
+        <Text
+          weight={800}
+          size="sm"
+          align="center">
+          {mango.mango.mangoTitle}
+        </Text>
         <Space h="xs="></Space>
-        <Card.Section>
-          <Group className={classes.btnGroup} position='center' spacing='0' noWrap='true' width='100%'>
-            <Button className={classes.optionBtn} color={valueInfo} radius={0} onClick={() => setToggleInfo()}>INFO</Button>
-            <Button className={classes.optionBtn} color={valueRemarks} radius={0} onClick={() => setToggleRemarks()}>REMARKS</Button>
-          </Group>
-        </Card.Section >
       </Card>
-      <Modal withCloseButton={false} centered opened={isDeleteRecordDiagOpen} onClose={()=> setDeleteRecordDiagOpen(false)} closeOnClickOutside>
-          <DeleteRecordDialog recordType={RecordType.FINISHED}  recordId={mango.finishedId}></DeleteRecordDialog> 
-          </Modal>
+      <Modal
+        size={matchesSmallMobileView ? "100%" : "undefined"}
+        padding={0} withCloseButton={false} centered opened={isUpdateMangoDiagOpen}
+        onClose={() => setUpdateMangoDiagOpen(false)}
+        closeOnClickOutside>
+        <UpdateMango mango={mango} />
+      </Modal>
+      <Modal withCloseButton={false} centered opened={isDeleteRecordDiagOpen} onClose={() => setDeleteRecordDiagOpen(false)} closeOnClickOutside>
+        <DeleteRecordDialog recordType={RecordType.FINISHED} recordId={mango.finishedId}></DeleteRecordDialog>
+      </Modal>
     </div>
   );
 

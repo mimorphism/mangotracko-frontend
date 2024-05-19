@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { createStyles, Center, Text, Button, UnstyledButton, Container } from '@mantine/core';
+import { createStyles, Center, Text, Group, UnstyledButton, Container } from '@mantine/core';
 import { useContext, useReducer, useEffect, useState } from 'react';
 import { UserContext } from './services/UserContext';
 import AuthService from './services/AuthService';
@@ -22,13 +22,13 @@ const Header = ({ username }) => {
   const toggleActivePage = (state, action) => {
     switch (action.type) {
       case "BACKLOG":
-        return { BACKLOG: true, CTLY_READING: false, FINISHED: false, ADD: false };
+        return { BACKLOG: true, CTLY_READING: false, FINISHED: false, SEARCH: false };
       case "CTLY_READING":
-        return { BACKLOG: false, CTLY_READING: true, FINISHED: false, ADD: false };
+        return { BACKLOG: false, CTLY_READING: true, FINISHED: false, SEARCH: false };
       case "FINISHED":
-        return { BACKLOG: false, CTLY_READING: false, FINISHED: true, ADD: false };
-      case "ADD":
-        return { BACKLOG: false, CTLY_READING: false, FINISHED: false, ADD: true };
+        return { BACKLOG: false, CTLY_READING: false, FINISHED: true, SEARCH: false };
+      case "SEARCH":
+        return { BACKLOG: false, CTLY_READING: false, FINISHED: false, SEARCH: true };
       default:
         return initialState;
     }
@@ -39,7 +39,7 @@ const Header = ({ username }) => {
     BACKLOG: false,
     CTLY_READING: false,
     FINISHED: false,
-    ADD: false
+    SEARCH: false
   }
 
 
@@ -56,8 +56,8 @@ const Header = ({ username }) => {
     else if (currentRoute === '/currentlyreading') {
       toggle({ type: 'CTLY_READING', value: true });
     }
-    else if (currentRoute === '/addmango') {
-      toggle({ type: 'ADD', value: true });
+    else if (currentRoute === '/search') {
+      toggle({ type: 'SEARCH', value: true });
     }
 
   }, []);
@@ -69,32 +69,13 @@ const Header = ({ username }) => {
     header: {
 
       ref: getRef('header'),
-      display: 'flex',
+      // display: 'flex',
       textAlign: 'right',
       lineHeight: '40px',
       padding: '0 30px',
       position: `relative`,
-      flex: '0 1 auto',
+      // flex: '0 1 auto',
       borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]}`,
-
-      // '&:before': {
-      //   content: '""',
-      //   //https://i.imgur.com/CWyDX0e.png - alice
-      //   //https://i.imgur.com/Rp4sCUQ.jpg - carol
-      //   backgroundImage: `linear-gradient(to bottom, #0000, #121212),url('https://i.imgur.com/Rp4sCUQ.jpg')`,
-      //   backgroundSize: 'cover',
-      //   // position: 'absolute',
-      //   top: '0px',
-      //   right: '0px',
-      //   bottom: '0px',
-      //   left: '0px',
-      //   opacity: 0.8,
-      //   backgroundRepeat: 'no-repeat',
-      //   zIndex:'-1',
-      //   position: 'fixed',
-      //   width:'100%',
-      //   height:'10vw',
-      // },
 
       [`@media (max-width: 1024px)`]: {
         padding: 0,
@@ -164,7 +145,10 @@ const Header = ({ username }) => {
       display: 'flex',
       justifyContent: 'space-between',
       paddingBottom: theme.spacing.xs,
-    }
+      alignItems: 'center',
+      maxWidth:'1440px',
+    },
+
   }));
 
   const { classes, cx } = useStyles();
@@ -183,16 +167,19 @@ const Header = ({ username }) => {
 
 return (
   <div className={classes.header}>
-    {!matches && <MobileMenu username={username} tryLogout={tryLogout}></MobileMenu>}
-    {!matches && <Text align="left" className='logoOnly'>MANGOTRACKO</Text>}
-
+    {!matches &&
+    <MobileMenu username={username} tryLogout={tryLogout}></MobileMenu>
+    }
+    
+    
     {matches &&
       <Container className={classes.container}>
-        <div className={classes.operationsList}>
-          <Link to="addMango" className='headerLinkWrapper'
-            onClick={() => toggle({ type: 'ADD', value: true })}
-          ><UnstyledButton><FaSearchengin color="white" size="2.5rem" /></UnstyledButton>
-            <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.ADD })}></div>
+        {/* <div className={classes.operationsList}> */}
+        <Center>
+        <Link to="search" className='headerLinkWrapper'
+        onClick={() => toggle({ type: 'SEARCH', value: true })}
+          >Search
+            <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.SEARCH })}></div>
           </Link>
           <Link to="backlog" className='headerLinkWrapper'
             onClick={() => toggle({ type: 'BACKLOG', value: true })}
@@ -209,8 +196,12 @@ return (
           >Currently Reading
             <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.CTLY_READING })}></div>
           </Link>
+          </Center>
+          <Group 
+                spacing={0} position="right" noWrap>
           <UserButton username={username} tryLogout={tryLogout} />
-        </div>
+          </Group>
+        {/* </div> */}
       </Container>
     }
 

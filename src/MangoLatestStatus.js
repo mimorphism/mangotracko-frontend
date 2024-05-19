@@ -1,31 +1,28 @@
 
-import { Badge, Group, createStyles } from '@mantine/core';
+import { Badge, Group, createStyles,Modal } from '@mantine/core';
+import { useHover } from '@mantine/hooks';
 import { gql, useQuery } from '@apollo/client';
 import { LoadingOverlay } from '@mantine/core';
 import { formatDistance } from 'date-fns'
 import parseIso from 'date-fns/parseISO';
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useMemo } from 'react';
 import { resourceAxiosInstance } from './services/AxiosService';
 import AuthHeader from './util/authHeaderHelper';
-
-
-
-
+import { getPrettifiedDate } from './util/utils';
 
 
 const MangoLatestStatus = ({ mango, setFinalChapter }) => {
 
   const title = mango.mango.mangoTitle;
-  const currentChapter = mango.lastChapterRead;
-  const lastReadTime = mango.lastReadTime;
   const anilistId = mango.mango.anilistId;
+  const [openRemarks, setOpenRemarks] = useState(false);
 
   const useStyles = createStyles((theme) => ({
 
     statusBadgeGroup: {
-      [`@media (max-width: 1024px)`]: {
+      [`@media (min-width: 768px) and (max-width: 1024px)`]: {
         justifyContent:'left',
-        // flexWrap:'wrap'
+        flexDirection:'column'
       },
     }
   }));
@@ -49,10 +46,18 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
     }
   }
 
-  const lastReadInfo = (lastReadTime) => {
-    //subDays(parseIso(lastReadTime, new Date()), 3)
-    let lastReadTimeISO = parseIso(lastReadTime, new Date());
-    return `LAST READ: ${formatDistance(lastReadTimeISO, new Date(), { addSuffix: true })}`;
+  const getPrettyDateInfo = (time, type) => {
+    let lastReadTimeISO = parseIso(time, new Date());
+    if(type === 'CURRENTLY_READING'){
+      return `LAST READ ${formatDistance(lastReadTimeISO, new Date(), { addSuffix: true })}`;
+    }
+    if(type === 'FINISHED'){
+      return `FINISHED ${formatDistance(lastReadTimeISO, new Date(), { addSuffix: true })}`;
+    }
+    if(type === 'BACKLOG'){
+      return `ADDED ${formatDistance(lastReadTimeISO, new Date(), { addSuffix: true })}`;
+    }
+    
   }
 
 
@@ -92,14 +97,28 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
         loaderProps={{ size: '200', variant: 'bars' }} visible={loading} />
       {
         !loading && <Group position='center' className={classes.statusBadgeGroup} >
-          <Badge style={{ display: 'inline-table' }} size="lg" radius="xs">{mangoStatus(data.Media.status)}</Badge>
-          <Badge style={{ display: 'inline-table' }} size="lg" radius="xs">{lastReadInfo(lastReadTime)}</Badge>
+          <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{mangoStatus(data.Media.status)}</Badge>
+          {mango.lastReadTime && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`${getPrettyDateInfo(mango.lastReadTime, 'CURRENTLY_READING')}, ${getPrettifiedDate(mango.lastReadTime)}`}</Badge>}
           {
-            readingProgress(data.Media.chapters, currentChapter) != currentChapter &&
-            <Badge style={{ display: 'inline-table' }} size="lg" radius="xs">{readingProgress(data.Media.chapters, currentChapter)}</Badge>
+            mango.lastChapterRead && readingProgress(data.Media.chapters, mango.lastChapterRead) != mango.lastChapterRead ?
+            <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{` LAST READ AT CHAPTER ${mango.lastChapterRead}, ${readingProgress(data.Media.chapters, mango.lastChapterRead)}`}</Badge>
+            :
+            mango.lastChapterRead && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{` LAST READ AT CHAPTER ${mango.lastChapterRead}`}</Badge>
+          }
+          
+          {mango.completionDateTime && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`${getPrettyDateInfo(mango.completionDateTime, 'FINISHED')}, ${getPrettifiedDate(mango.completionDateTime)}`}</Badge>}
+          {mango.addedDateTime && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`${getPrettyDateInfo(mango.addedDateTime, 'BACKLOG')}, ${getPrettifiedDate(mango.addedDateTime)}`}</Badge>}
+          <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`AUTHOR: ${mango.mango.author}`}</Badge>
+
+          {mango.remarks && 
+          <Badge onClick={() => setOpenRemarks(true)}variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">SHOW REMARKS</Badge>
           }
         </Group>
       }
+      
+      {<Modal opened={openRemarks} size="xl" onClose={() => setOpenRemarks(false)} centered withCloseButton={false}>
+            {mango.remarks ? mango.remarks : 'No remarks'}
+        </Modal>}
     </div>
   );
 }

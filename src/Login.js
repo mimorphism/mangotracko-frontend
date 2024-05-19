@@ -71,8 +71,9 @@ const Login = () => {
     return (
         <div className={classes.div}>
     {state.loggedOutByAnotherSession &&<Alert title="Bummer!" color="red">You've been logged out by another session</Alert> }
-    {state.loggedOutSessionExpiry &&<Alert title="Bummer!" color="red">Your session has expired. Please login again</Alert> }
-        <Paper radius="md" p="xl" withBorder >
+    {state.loggedOutSessionExpired &&<Alert title="Bummer!" color="red">Your session has expired. Please login again</Alert> }
+    {state.loggedOutServerUnreachable &&<Alert title="Sorry!" color="red">MangoTracko is out of service at the moment!</Alert> }
+        {!state.loggedOutServerUnreachable && <Paper radius="md" p="xl" withBorder >
             <Text size="lg" weight={500}>
                 Welcome to MangoTracko, {type} with
             </Text>
@@ -116,7 +117,7 @@ const Login = () => {
                     <Button type="submit">{upperFirst(type)}</Button>
                 </Group>
             </form>
-        </Paper>
+        </Paper>}
         </div>
     );
 }

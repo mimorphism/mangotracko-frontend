@@ -49,7 +49,7 @@ const SearchSettings = ({ isAdult, setIsAdult }) => {
             <Space h="sm" />
             <Group position="apart" className={classes.item} noWrap spacing="xl">
                 <div>
-                    <Text>Filter adult content</Text>
+                    <Text>Adult content</Text>
                 </div>
                 <Switch
                     checked={isAdult}

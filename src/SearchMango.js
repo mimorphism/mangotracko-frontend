@@ -35,7 +35,7 @@ const SearchMango = () => {
   const { data: existingRecords, isPending } = useAxios('/existingmangorecords');
   const RECORDS = 'RECORDS';
   const NEW_MANGO = 'NEW MANGO';
-  const [searchType, setSearchType] = useToggle([RECORDS, NEW_MANGO]);
+  const [searchType, setSearchType] = useToggle([NEW_MANGO,RECORDS]);
   const [isAdult, setIsAdult] = useState(false);
   const [searchSettingsVisible, setSearchSettingsVisible] = useState(false);
 
@@ -242,7 +242,7 @@ return (
             onChange={setSearchType}
             size="sm"
             orientation="vertical"
-            data={[RECORDS, NEW_MANGO]}
+            data={[NEW_MANGO,RECORDS]}
             radius={0}
             value={searchType}
           />
@@ -263,7 +263,7 @@ return (
           </div>}
       {/*Section for new mango search*/}
       {/*Section for record search*/}
-        {input !== '' && searchType === RECORDS && 
+        {searchType === RECORDS && 
           <div className={classes.recordContent}>
             <SearchRecordTable rawData={existingRecords} input={input}></SearchRecordTable>
           </div>

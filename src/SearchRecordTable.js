@@ -2,13 +2,11 @@ import { useState } from 'react';
 import {
   createStyles,
   Table,
-  ScrollArea,
   UnstyledButton,
   Group,
   Text,
   Center,
   HoverCard,
-  Modal
 } from '@mantine/core';
 import { keys } from '@mantine/utils';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';

@@ -1,11 +1,5 @@
 import { Card, Image, Text, Space } from '@mantine/core';
 import { createStyles } from '@mantine/core';
-import { Group, Button } from '@mantine/core';
-import { useToggle } from '@mantine/hooks';
-import format from 'date-fns/format';
-import parseIso from 'date-fns/parseISO';
-import { FaPen } from 'react-icons/fa';
-import { Fragment } from 'react';
 
 
 
@@ -48,11 +42,14 @@ const SearchResult = ({ mango }) => {
         <Card className={classes.card}
           shadow="sm"
           style={{paddingBottom:0}}>
-          <Card.Section>
+          <Card.Section 
+          //so that ADD text can be centered on the image and not the whole Paper
+          style={{position:'relative'}}
+          >
             <Image className={classes.mangoImg}
               src={mango.img} withPlaceholder
              />
-            <div className={classes.imgHover}>
+             <div className={classes.imgHover}>
               <Text
                 style={{ fontSize: '2.5em', cursor: 'pointer' }}
                 weight={800}
@@ -60,6 +57,7 @@ const SearchResult = ({ mango }) => {
               >
                 ADD
               </Text></div>
+            
           </Card.Section>
           <Space h="xs"></Space>
           <Text

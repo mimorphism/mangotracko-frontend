@@ -1,7 +1,5 @@
 import { createStyles, Container, Group, ActionIcon, Text, Center, Space } from '@mantine/core';
 import { FaGithub } from 'react-icons/fa';
-import { Link } from 'react-router-dom/cjs/react-router-dom.min';
-
 
 const useStyles = createStyles((theme) => ({
     footer: {
@@ -16,7 +14,7 @@ const useStyles = createStyles((theme) => ({
         alignItems: 'center',
         paddingTop: theme.spacing.xs,
         paddingBottom: theme.spacing.xs,
-
+        maxWidth:'1440',
         [theme.fn.smallerThan('xs')]: {
             flexDirection: 'column',
         },

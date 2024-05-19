@@ -10,8 +10,6 @@ import { notifyOK, notifyKO} from './util/utils';
 
 
 
-
-
 const DeleteRecordDialog = ({recordType, recordId}) => {
 
     const useStyles = createStyles((theme) => ({
@@ -85,7 +83,6 @@ const DeleteRecordDialog = ({recordType, recordId}) => {
 }
 
         </>
-
     );
 }
 
