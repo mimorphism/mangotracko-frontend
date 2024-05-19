@@ -1,13 +1,13 @@
 import {
     Text, Group, Stack, TextInput, Button, Paper, Space,
-    createStyles, LoadingOverlay, Anchor, PasswordInput,
+    createStyles, Anchor, PasswordInput, Alert
 } from '@mantine/core';
 import { useMediaQuery, useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { useContext } from 'react';
 import AuthService from './services/AuthService';
 import { UserContext } from './services/UserContext';
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 
 
 
@@ -59,7 +59,6 @@ const Login = () => {
     const { classes } = useStyles();
 
     const authenticate = (values) => {
-        console.log(values);
         if (type !== 'register') {
             AuthService.login(values.username, values.password).then((userData) => {
                 dispatch({ type: 'LOGGED_IN', value: userData.user });
@@ -70,7 +69,11 @@ const Login = () => {
     }
 
     return (
-        <Paper radius="md" p="xl" withBorder className={classes.div}>
+        <div className={classes.div}>
+    {state.loggedOutByAnotherSession &&<Alert title="Bummer!" color="red">You've been logged out by another session</Alert> }
+    {state.loggedOutSessionExpired &&<Alert title="Bummer!" color="red">Your session has expired. Please login again</Alert> }
+    {state.loggedOutServerUnreachable &&<Alert title="Sorry!" color="red">MangoTracko is out of service at the moment!</Alert> }
+        {!state.loggedOutServerUnreachable && <Paper radius="md" p="xl" withBorder >
             <Text size="lg" weight={500}>
                 Welcome to MangoTracko, {type} with
             </Text>
@@ -114,21 +117,8 @@ const Login = () => {
                     <Button type="submit">{upperFirst(type)}</Button>
                 </Group>
             </form>
-        </Paper>
-        // <Center className={classes.div}>
-        //     <form onSubmit={form.onSubmit((values) => tryLogin(values))}>
-        //         <Paper className={classes.paper} p='xl' pt={0} size={largeScreen ? 'xl' : 'md'}>
-        //             <Center><h2>LOGIN</h2></Center>
-        //             <TextInput {...form.getInputProps('username')} className={classes.controls} size={largeScreen ? 'xl' : 'md'} label="Username"/>
-        //             <Space h="md" />
-        //             <PasswordInput  {...form.getInputProps('password')} className={classes.controls} size={largeScreen ? 'xl' : 'md'} label="Password"/>
-        //             <Space h="xl" />
-        //             <Button size={largeScreen ? 'xl' : 'md'} className={classes.controls} type="submit" >Login</Button>
-        //             {error && <ErrorPopup error={error.message}></ErrorPopup>}
-        //         </Paper>
-        //     </form>
-        // </Center>
-
+        </Paper>}
+        </div>
     );
 }
 

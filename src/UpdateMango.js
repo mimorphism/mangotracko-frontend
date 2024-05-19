@@ -1,29 +1,21 @@
 
 import {
-  NumberInput, Button, Space, Group, Paper, Center, LoadingOverlay,
-  Textarea, Tooltip, Card, Stack
+  NumberInput, Button, Space, Paper, Center, LoadingOverlay,
+  Textarea, SegmentedControl, Divider, Text, Checkbox
 } from '@mantine/core';
 import { Image as MantineImage } from '@mantine/core';
-import { TimeInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { createStyles } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
-import { useLocation } from "react-router-dom";
-import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import MangoLatestStatus from './MangoLatestStatus';
-import { formatISO, isBefore, isEqual, add } from 'date-fns';
-import dayjs from 'dayjs';
-import parseIso from 'date-fns/parseISO';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance'
+import { formatISO } from 'date-fns';
+import { resourceAxiosInstance } from './services/AxiosService';
 import { useHistory } from 'react-router-dom';
-import { FaCheck, FaDatabase } from 'react-icons/fa';
+import { FaDatabase } from 'react-icons/fa';
 import AuthHeader from './util/authHeaderHelper';
 import TokenService from './services/TokenService';
 import { getCurrentTime, notifyOK, notifyKO } from './util/utils';
 import { useMediaQuery } from '@mantine/hooks';
-import { useElementSize } from '@mantine/hooks';
-
 
 
 
@@ -34,20 +26,25 @@ const UpdateMango = ({ mango }) => {
   const lastReadTime = mango.lastReadTime;
   const bannerImg = mango.mango.bannerImg;
   const anilistId = mango.mango.anilistId;
-  const coverImg = mango.mango.img;
+  const remarks = mango.remarks;
 
-  const [imgHeight, setImgHeight] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingFinished, setSubmittingFinished] = useState(false);
   const history = useHistory();
   const [finalChapter, setFinalChapter] = useState(0);
-  const [remarksMsg, setRemarksMsg] = useState("");
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const { mangoLatestStatusRef, widthMangoLatestStatus, heightMangoLatestStatus } = useElementSize();
-  const { paperContainerRef, widthPaperContainer, heightPaperContainer } = useElementSize();
+  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)');
+  const INFO = "INFO";
+  const UPDATE = "UPDATE";
+  const [tab, setTab] = useState(INFO);
+  
+  const [markAsFinished, setMarkAsFinished] = useState(false);
+  const [markAsCurrentlyReading, setMarkAsCurrentlyReading] = useState(false);
 
-
-
+  const [isBacklogPage, setIsBacklogPage] = useState(false);
+  const [isCtlyReadingPage, setIsCtlyReadingPage] = useState(false);
+  const [isFinishedPage, setIsFinishedPage] = useState(false);
+  
 
 
   const form = useForm({
@@ -56,11 +53,14 @@ const UpdateMango = ({ mango }) => {
       status: mangoStatus,
       lastChapterRead: lastChapterRead,
       lastReadTime: lastReadTime,
-      remarks: ""
+      remarks: remarks ? remarks : ""
     },
     validate: {
       lastChapterRead: (value) => (value <= lastChapterRead ?
         'Chapter must be greater than current chapter read' : null),
+
+      remarks: (value) => (value === remarks ?
+        'New remarks must not be the same as previous' : null),
     },
   });
 
@@ -85,7 +85,7 @@ const UpdateMango = ({ mango }) => {
 
     },
     inputs: {
-      maxWidth: '300px',
+      maxWidth: '500px',
       width: '100%',
       input: {
         height: 'auto',
@@ -103,48 +103,74 @@ const UpdateMango = ({ mango }) => {
   useEffect(() => {
     if (submittingFinished) {
       notifyOK();
-      setTimeout(() => 
-        
+      setTimeout(() =>
+
         history.go(0)
         , 1000);
     }
   }, [submittingFinished])
 
   useEffect(() => {
-    if (finalChapter && finalChapter > 0
-    ) {
-      setRemarksMsg(`Optional: ${finalChapter} is the final chapter of this mango.By saving you will finish this mango.
-                You can put remarks if you wish`)
+    if (mango.completionDateTime) {
+      setIsFinishedPage(true);
+      setMarkAsFinished(true);
     }
-  }, [finalChapter])
+    else if (mango.addedDateTime) {
+      setIsBacklogPage(true);
+    }
+    else if (mango.lastReadTime) {
+      setIsCtlyReadingPage(true);
+    }
+  }, [])
 
-  const getUpdateEndpoint = (lastChapterRead, finalChapter) => {
-    return lastChapterRead == finalChapter ? '/updateMangoFinish' : 'updateMango'
+  const getUpdateEndpoint = () => {
+    if (markAsFinished && mango.lastReadTime) {
+      return '/updateMangoFinish';
+    } else if (markAsFinished && mango.completionDateTime) {
+      return '/updateFinishedRemarks';
+    } else {
+      return 'updateMango';
+
+    }
+  }
+
+  const getUpdatePayload = (values) => {
+    if (markAsFinished && mango.completionDateTime) {
+      return {
+        'remarks': values.remarks,
+        'anilistId': anilistId
+      }
+    }
+    else {
+      const mangoTitleForm = values.title;
+      const lastChapterReadForm = values.lastChapterRead;
+      const currentDate = new Date();
+      const newLastReadTime = formatISO(currentDate, { representation: 'date' }) + 'T' + getCurrentTime(currentDate);
+      const mango =
+      {
+        'mangoTitle': mangoTitleForm,
+        'lastChapterRead': lastChapterReadForm,
+        'lastReadTime': newLastReadTime,
+        'user': TokenService.getUsername(),
+        'anilistId': anilistId
+      }
+      if (values.remarks) {
+        mango.remarks = values.remarks;
+      }
+      if(isBacklogPage){
+        mango.lastChapterRead = 1;
+      }
+      return mango;
+    }
   }
 
 
   const submitMangoUpdate = (values) => {
     setIsSubmitting(true);
-    const mangoTitleForm = values.title;
-    const lastChapterReadForm = values.lastChapterRead;
-    const currentDate = new Date();
-    const newLastReadTime = formatISO(currentDate, { representation: 'date' }) + 'T' + getCurrentTime(currentDate);
-
-    const mango =
-    {
-      'mangoTitle': mangoTitleForm,
-      'lastChapterRead': lastChapterReadForm,
-      'lastReadTime': newLastReadTime,
-      'user': TokenService.getUsername(),
-      'anilistId': anilistId
-    }
-
-    if (values.remarks) {
-      mango.remarks = values.remarks;
-    }
+    const mango = getUpdatePayload(values);
 
     setTimeout(() => {
-      resourceAxiosInstance.put(getUpdateEndpoint(lastChapterReadForm, finalChapter), mango,
+      resourceAxiosInstance.service.put(getUpdateEndpoint(), mango,
         {
           headers: AuthHeader.getAuthHeader()
         })
@@ -161,58 +187,114 @@ const UpdateMango = ({ mango }) => {
     }, 1000)
 
   }
+
   return (
     <div
-      style={{ 
+      style={{
         maxWidth: '700px',
-        }}
-      >
+      }}
+    >
       {/*position relative for form to enable LoadingOverlay to work nicely*/}
       <form style={{ position: 'relative', margin: 0 }} onSubmit={form.onSubmit((values) => submitMangoUpdate(values))}>
         <LoadingOverlay visible={isSubmitting} />
-      {bannerImg && !isMobile && <MantineImage withPlaceholder src={bannerImg} />}
+        {bannerImg && !isMobile &&
+          <MantineImage withPlaceholder src={bannerImg} />}
         {!submittingFinished &&
           <Paper p={bannerImg && !isMobile ? 0 : "sm"} className={classes.Form}>
-            {bannerImg && !isMobile && <>
-              <Space h="md" /></>}
-            <MangoLatestStatus mango={mango} setFinalChapter={setFinalChapter} />
-            <Space h="md" />
-
-            <Center>{finalChapter != 0 ?
-              <NumberInput className={classes.inputs} min={lastChapterRead} max={finalChapter} required variant='default' label="Last chapter read" mb="20" size="lg"
-                {...form.getInputProps('lastChapterRead')} />
-              :
-              <NumberInput
-                className={classes.inputs}
-                min={lastChapterRead} required variant='default' label="Last chapter read" mb="20" size="lg"
-                {...form.getInputProps('lastChapterRead')}
+            <Center>
+              <Text
+                weight={900}
+                size="lg">
+                {mangoTitle}
+              </Text>
+            </Center>
+            <Space h="sm" />
+            <Center>
+              <SegmentedControl
+                radius='xs'
+                color='blue'
+                value={tab}
+                onChange={setTab}
+                size="sm"
+                data={[
+                  {
+                    label: (<Text
+                      weight={800}
+                      size="xs">
+                      INFO
+                    </Text>), value: INFO
+                  },
+                  {
+                    label: (<Text
+                      weight={800}
+                      size="xs">
+                      UPDATE
+                    </Text>),
+                    value: UPDATE,
+                  }
+                ]}
               />
-            }</Center>
-            <Center>{finalChapter != 0 && form.values['lastChapterRead'] == finalChapter && !isMobile &&
-              <Tooltip
-                label={remarksMsg}
-                position="top" placement="center" gutter={10}>
+            </Center>
+            <Divider my="sm" />
+            {/* CURRENTLY READING */}
+            {tab === UPDATE && isCtlyReadingPage &&
+              <>
+                <Center>
+                  <NumberInput className={classes.inputs} min={lastChapterRead} max={!finalChapter ? lastChapterRead + 1000 : finalChapter} required variant='default' label="Last chapter read" mb="20" size={isTablet?"lg":"md"}
+                    {...form.getInputProps('lastChapterRead')} />
+                </Center>
+              </>
+            }
+            {/* REUSED FOR FINISHED */}
+            {tab === UPDATE && markAsFinished && !isMobile &&
+              <Center>
                 <Textarea
                   className={classes.inputs}
                   label="Remarks"
                   maxRows={5}
-                  size='lg'
+                  size='md'
                   variant='default'
+                  placeholder={mango.remarks ? mango.remarks : ''}
                   {...form.getInputProps('remarks')}
-                /></Tooltip>}</Center>
-            <Center>{finalChapter != 0 && form.values['lastChapterRead'] == finalChapter && isMobile &&
-              <Textarea
-                className={classes.inputs}
-                label="Remarks"
-                maxRows={5}
-                size='lg'
-                variant='default'
-                {...form.getInputProps('remarks')}
-              />
-            }</Center>
+                />
+              </Center>
+            }
+            {/* REUSED FOR FINISHED */}
+            {tab === UPDATE && isCtlyReadingPage &&
+              <>
+                <Space h="md" />
 
-            <Space h="md" />
-            <Center><Button size="lg" type="submit" rightIcon={<FaDatabase size={15} />}>Save</Button></Center>
+                <Center>
+                  <Checkbox
+                    checked={markAsFinished}
+                    onChange={(event) => setMarkAsFinished(event.currentTarget.checked)}
+                    label="Mark as finished"
+                  /></Center>
+              </>
+            }
+            {tab === UPDATE && isBacklogPage &&
+              <>
+                <Space h="md" />
+                <Center>
+                  <Checkbox
+                    checked={markAsCurrentlyReading}
+                    onChange={(event) => setMarkAsCurrentlyReading(event.currentTarget.checked)}
+                    label="Mark as currently reading at chapter 1"
+                  /></Center>
+              </>
+            }
+            {tab === INFO &&
+              <>
+                <MangoLatestStatus mango={mango} setFinalChapter={setFinalChapter} />
+                <Space h="md" />
+              </>
+            }
+            {tab !== INFO &&
+              <>
+                <Space h="md" />
+                <Center><Button disabled={isBacklogPage && !markAsCurrentlyReading} size="sm" type="submit" rightIcon={<FaDatabase size={15} />}>SAVE</Button></Center>
+              </>
+            }
           </Paper>
         }
       </form>

@@ -41,7 +41,7 @@ const MostRecentUpdatesAndDailyStats = ({mostRecentUpdateStats, dailyStats}) => 
         return (
             <Card withBorder radius="md" className={classes.card}>
                 <Group noWrap spacing={0}>
-                    <Image src={data.mango.img} width={190} height={180} />
+                    <Image src={data.mango.img} width={190} height="auto" />
                     <div className={classes.body}>
                         <Text transform="uppercase" color="dimmed" weight={700} size="xs">
                             {title}

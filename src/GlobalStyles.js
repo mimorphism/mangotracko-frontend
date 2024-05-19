@@ -42,7 +42,10 @@ function GlobalStyles() {
                 '.headerLinkWrapper': {
                     display: 'inline-block',
                     padding: '0',
-                    margin: '15px 25px',
+                    marginTop: '15px',
+                    marginBottom: '15px',
+                    marginLeft: '0px',
+                    marginRight: '30px',
                     position: 'relative',
                     textDecoration: 'none',
                     textTransform: 'uppercase',
@@ -55,7 +58,13 @@ function GlobalStyles() {
                     [`@media (max-width: 1024px)`]: {
                         fontSize: theme.fontSizes.md,
                     },
-                }
+                },
+                '.mainDiv': {
+                    '&:hover': {
+                        boxShadow: `${theme.shadows.md} !important`,
+                        transform: 'scale(1.07)',
+                    }
+                },
 
             })}
         />

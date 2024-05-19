@@ -9,14 +9,18 @@ import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { formatISO } from 'date-fns';
 import { useState, useEffect } from 'react';
-import { resourceAxiosInstance } from './services/ResourceAxiosInstance'
+import { resourceAxiosInstance } from './services/AxiosService';
 import AuthHeader from './util/authHeaderHelper';
 import TokenService from './services/TokenService';
 import { FaCheck } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
-import {notifyOK, notifyKO} from './util/utils';
+import { notifyOK, notifyKO } from './util/utils';
 import DeleteRecordDialog from './DeleteRecordDialog';
 import { RecordType } from './util/utils';
+import UpdateMango from './UpdateMango';
+import { useMediaQuery } from '@mantine/hooks';
+
+
 
 
 
@@ -37,6 +41,8 @@ const BacklogMango = ({ mango }) => {
     const [submittingFinished, setSubmittingFinished] = useState(false);
     const history = useHistory();
     const [isDeleteRecordDiagOpen, setDeleteRecordDiagOpen] = useState(false);
+    const [isUpdateMangoDiagOpen, setUpdateMangoDiagOpen] = useState(false);
+    const matchesSmallMobileView = useMediaQuery('(max-width: 500px)');
 
 
 
@@ -45,33 +51,6 @@ const BacklogMango = ({ mango }) => {
         standardFont: {
             // fontFamily: "'Quicksand', sans-serif",
             textTransform: 'uppercase'
-        },
-        mangoImg:
-        {
-            ref: getRef('mangoImg'),
-        },
-        card:
-        {
-            [`&:hover .${getRef('mangoImg')}`]: {
-                opacity: 0.3,
-            },
-
-            [`&:hover .${getRef('imgHover')}`]: {
-                opacity: 1,
-            },
-        },
-        imgHover:
-        {
-            ref: getRef('imgHover'),
-            transition: '.5s ease',
-            opacity: 0,
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            msTransform: 'translate(-50%, -50%)',
-            cursor: 'pointer'
-
         },
         notification:
         {
@@ -109,7 +88,7 @@ const BacklogMango = ({ mango }) => {
         console.log(mango);
 
         setTimeout(() => {
-            resourceAxiosInstance.put('/updateMango', mango,
+            resourceAxiosInstance.service.put('/updateMango', mango,
                 {
                     headers: AuthHeader.getAuthHeader()
                 })
@@ -139,7 +118,7 @@ const BacklogMango = ({ mango }) => {
 
 
     return (
-        <Center>
+        <div className='mainDiv'>
             <div style={{
                 position: 'relative'//to contain loading overlay
             }}>
@@ -148,23 +127,18 @@ const BacklogMango = ({ mango }) => {
                     <>
                         <Indicator label="X"
                             classNames={{ indicator: classes.indicator }}
-                            onClick={()=> setDeleteRecordDiagOpen(true)} color="dark" size={20} withBorder>
+                            onClick={() => setDeleteRecordDiagOpen(true)}
+                            color="dark" size={20} withBorder>
                         </Indicator>
 
                         <Card className={classes.card}
                             shadow="sm">
                             <Card.Section>
                                 <Image className={classes.mangoImg} src={mango.mango.img} withPlaceholder
-                                    onClick={() => submitMangoUpdate(mango.mango.mangoTitle, mango.mango.anilistId)}
+                                    // onClick={() => submitMangoUpdate(mango.mango.mangoTitle, mango.mango.anilistId)}
+                                    onClick={() => setUpdateMangoDiagOpen(true)}
+
                                 />
-                                <div className={classes.imgHover}>
-                                    <Text className={classes.standardFont}
-                                        style={{ fontSize: '2.5em' }}
-                                        weight={800}
-                                        align="center"
-                                    >
-                                        READ
-                                    </Text></div>
                             </Card.Section>
                             <Fragment>
                                 <Space h="xs"></Space>
@@ -174,28 +148,22 @@ const BacklogMango = ({ mango }) => {
                                     align="center">
                                     {mango.mango.mangoTitle}
                                 </Text>
-                                <Text className={classes.standardFont}
-                                    size="sm"
-                                    align="center"
-                                    weight={800}>
-                                    <FaStar style={{ fontSize: 'sm' }} /> {mango.mango.author} <FaStar style={{ fontSize: 'sm' }} />
-                                </Text>
-                                <Text
-            size="sm"
-            align="center"
-            weight={800}
-          >
-            {mango.mango.status}
-          </Text>
                             </Fragment>
                         </Card>
                     </>
                 }
             </div>
-            <Modal withCloseButton={false} centered opened={isDeleteRecordDiagOpen} onClose={()=> setDeleteRecordDiagOpen(false)} closeOnClickOutside>
-          <DeleteRecordDialog recordType={RecordType.BACKLOG}  recordId={mango.backlogId}></DeleteRecordDialog> 
-          </Modal>
-        </Center>
+            <Modal withCloseButton={false} centered opened={isDeleteRecordDiagOpen} onClose={() => setDeleteRecordDiagOpen(false)} closeOnClickOutside>
+                <DeleteRecordDialog recordType={RecordType.BACKLOG} recordId={mango.backlogId}></DeleteRecordDialog>
+            </Modal>
+            <Modal
+                size={matchesSmallMobileView ? "100%" : "undefined"}
+                padding={0} withCloseButton={false} centered opened={isUpdateMangoDiagOpen}
+                onClose={() => setUpdateMangoDiagOpen(false)}
+                closeOnClickOutside>
+                <UpdateMango mango={mango} />
+            </Modal>
+        </div>
     );
 }
 

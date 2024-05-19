@@ -1,4 +1,4 @@
-import { Menu, createStyles,Burger, Space,Center } from '@mantine/core';
+import { Menu, createStyles,Burger, Space,Center,Text } from '@mantine/core';
 import {FaUserAstronaut} from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
@@ -45,6 +45,7 @@ const MobileMenu = ({ username, tryLogout }) => {
       icon={<FaUserAstronaut size="2.5em"/>}>{username}<Space h="xs"></Space>LOGOUT</Menu.Item>
       </Menu.Dropdown>
     </Menu>
+    <Text align="left" className='logoOnly'>MANGOTRACKO</Text>
     </Center>
   );
 }

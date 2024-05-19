@@ -114,35 +114,6 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const data =
-{
-  '8/27/2022':
-  {
-    backlog: { label: 'Backlog', count: '10' },
-    ctlyreading: { label: 'Currently reading', count: '10' },
-    finished: { label: 'Finished', count: '10' },
-  }
-  ,
-  '8/26/2022':
-     {
-    backlog: { label: 'Backlog', count: '10' },
-    ctlyreading: { label: 'Currently reading', count: '10' },
-    finished: { label: 'Finished', count: '10' },
-  },
-  '8/25/2022':
-     {
-    backlog: { label: 'Backlog', count: '10' },
-    ctlyreading: { label: 'Currently reading', count: '10' },
-    finished: { label: 'Finished', count: '10' },
-  },
-  '8/24/2022':
-    {
-    backlog: { label: 'Backlog', count: '10' },
-    ctlyreading: { label: 'Currently reading', count: '10' },
-    finished: { label: 'Finished', count: '10' },
-  },
-}
-  ;
 
 export function DailyStats({stats}) {
   const { classes } = useStyles();

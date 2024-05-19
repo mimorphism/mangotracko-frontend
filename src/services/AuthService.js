@@ -1,56 +1,64 @@
-import { authAxiosInstance } from './AuthAxiosInstance';
 import TokenService from './TokenService';
+import { authAxiosInstance } from './AxiosService';
 import AuthHeader from '../util/authHeaderHelper';
-import { notifyOKCustom,notifyKOCustom, notifyLoading } from '../util/utils';
+import { notifyLoading, notifyLoadingCallback } from '../util/utils';
+import history from '../history';
+
 
 const register = (username, password) => {
-  return authAxiosInstance
-    .post('/auth/registration', {"username": username,"password": password}, {
+  notifyLoading('Registering your account...', 'register');
+  return authAxiosInstance.service
+    .post('/api/auth/registration', {"username": username,"password": password}, {
       headers:{"Content-Type": "application/json"}
     })
     .then((response) => {
       console.log(response);
-         notifyOKCustom(response.data.message, 'You can now login');
+         notifyLoadingCallback('You can now login', 'register',response.data.message, false );
     }).catch((error) => {
       console.log(error);
-       notifyKOCustom('Registration failed!', error.message);
+      notifyLoadingCallback(error.response.data.message, 'register', 'Registration failed!!', true );
+
     });
 };
 
 const login = (username, password) => {
-  notifyLoading('Logging you in...');
-  return authAxiosInstance
+  notifyLoading('Logging you in...', 'login');
+  return authAxiosInstance.service
     .post('/api/auth/login', {"username": username,"password": password}, {
       // auth:{'username': username,'password: password},
       headers:{"Content-Type": "application/json"}
     })
     .then((response) => {
       if (response.data.accessToken) {
-        notifyOKCustom('Login succesful!', 'Hey there ' + username);
+        notifyLoadingCallback('Hey there '+ username, 'login','Login succesful!', false );
         TokenService.setUser(response.data);
+        history.push('/home')
       }
       return response.data;
     }).catch((error) => {
-      console.log(error);
-       notifyKOCustom('Login failed!', error.message);
+      if(error.response != undefined){
+       notifyLoadingCallback(error.response.data.message, 'login','Login failed!', true );
+      }else{
+        notifyLoadingCallback('Server cannot be reached!', 'login','Login failed!', true );
+      }
+       return new Promise(() => {});
     });
 };
 
 
 const logout = () => {
-    notifyLoading('Logging you out...');
+  notifyLoading('Logging you out...', 'logout');
   const username = TokenService.getUsername();
   const accessToken = AuthHeader.getAuthHeaderForLogout();
   const refreshToken = AuthHeader.getRefreshTokenHeaderForLogout();
-  TokenService.removeUser();
-  return authAxiosInstance
+  return authAxiosInstance.service
     .post('/logout', {"username": username}, {
       headers: 
       {
         Authorization:accessToken,
         Refresher:refreshToken
       }
-    });
+    })
 };
 
 const AuthService = {
