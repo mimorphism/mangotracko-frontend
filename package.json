@@ -5,7 +5,7 @@
   "proxy": "http://192.168.0.2:8080",
   "dependencies": {
     "@apollo/client": "^3.5.10",
-    "@mantine/core": "^7.10.0",
+    "@mantine/core": "^7.10.2",
     "@mantine/dates": "^5.0.0",
     "@mantine/form": "^5.0.0",
     "@mantine/hooks": "^6.0.21",
