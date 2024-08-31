@@ -1,11 +1,11 @@
 
-import { Badge, Group, createStyles,Modal } from '@mantine/core';
+import { Badge, Group, createStyles, Modal } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
 import { gql, useQuery } from '@apollo/client';
 import { LoadingOverlay } from '@mantine/core';
 import { formatDistance } from 'date-fns'
 import parseIso from 'date-fns/parseISO';
-import { useState, useEffect,useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { resourceAxiosInstance } from './services/AxiosService';
 import AuthHeader from './util/authHeaderHelper';
 import { getPrettifiedDate } from './util/utils';
@@ -21,8 +21,8 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
 
     statusBadgeGroup: {
       [`@media (min-width: 768px) and (max-width: 1024px)`]: {
-        justifyContent:'left',
-        flexDirection:'column'
+        justifyContent: 'left',
+        flexDirection: 'column'
       },
     }
   }));
@@ -48,16 +48,16 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
 
   const getPrettyDateInfo = (time, type) => {
     let lastReadTimeISO = parseIso(time, new Date());
-    if(type === 'CURRENTLY_READING'){
+    if (type === 'CURRENTLY_READING') {
       return `LAST READ ${formatDistance(lastReadTimeISO, new Date(), { addSuffix: true })}`;
     }
-    if(type === 'FINISHED'){
+    if (type === 'FINISHED') {
       return `FINISHED ${formatDistance(lastReadTimeISO, new Date(), { addSuffix: true })}`;
     }
-    if(type === 'BACKLOG'){
+    if (type === 'BACKLOG') {
       return `ADDED ${formatDistance(lastReadTimeISO, new Date(), { addSuffix: true })}`;
     }
-    
+
   }
 
 
@@ -101,24 +101,24 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
           {mango.lastReadTime && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`${getPrettyDateInfo(mango.lastReadTime, 'CURRENTLY_READING')}, ${getPrettifiedDate(mango.lastReadTime)}`}</Badge>}
           {
             mango.lastChapterRead && readingProgress(data.Media.chapters, mango.lastChapterRead) != mango.lastChapterRead ?
-            <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{` LAST READ AT CHAPTER ${mango.lastChapterRead}, ${readingProgress(data.Media.chapters, mango.lastChapterRead)}`}</Badge>
-            :
-            mango.lastChapterRead && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{` LAST READ AT CHAPTER ${mango.lastChapterRead}`}</Badge>
+              <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{` LAST READ AT CHAPTER ${mango.lastChapterRead}, ${readingProgress(data.Media.chapters, mango.lastChapterRead)}`}</Badge>
+              :
+              mango.lastChapterRead && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{` LAST READ AT CHAPTER ${mango.lastChapterRead}`}</Badge>
           }
-          
+
           {mango.completionDateTime && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`${getPrettyDateInfo(mango.completionDateTime, 'FINISHED')}, ${getPrettifiedDate(mango.completionDateTime)}`}</Badge>}
           {mango.addedDateTime && <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`${getPrettyDateInfo(mango.addedDateTime, 'BACKLOG')}, ${getPrettifiedDate(mango.addedDateTime)}`}</Badge>}
-          <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`AUTHOR: ${mango.mango.author}`}</Badge>
+          <Badge variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">{`AUTHORED BY ${mango.mango.author}`}</Badge>
 
-          {mango.remarks && 
-          <Badge onClick={() => setOpenRemarks(true)}variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">SHOW REMARKS</Badge>
+          {mango.remarks &&
+            <Badge onClick={() => setOpenRemarks(true)} variant='filled' style={{ display: 'inline-table' }} size="lg" radius="xs">SHOW REMARKS</Badge>
           }
         </Group>
       }
-      
+
       {<Modal opened={openRemarks} size="xl" onClose={() => setOpenRemarks(false)} centered withCloseButton={false}>
-            {mango.remarks ? mango.remarks : 'No remarks'}
-        </Modal>}
+        {mango.remarks ? mango.remarks : 'No remarks'}
+      </Modal>}
     </div>
   );
 }

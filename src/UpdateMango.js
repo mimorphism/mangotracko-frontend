@@ -1,7 +1,7 @@
 
 import {
   NumberInput, Button, Space, Paper, Center, LoadingOverlay,
-  Textarea, SegmentedControl, Divider, Text, Checkbox
+  Textarea, SegmentedControl, Divider, Text, Checkbox, Group
 } from '@mantine/core';
 import { Image as MantineImage } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -37,14 +37,14 @@ const UpdateMango = ({ mango }) => {
   const INFO = "INFO";
   const UPDATE = "UPDATE";
   const [tab, setTab] = useState(INFO);
-  
+
   const [markAsFinished, setMarkAsFinished] = useState(false);
   const [markAsCurrentlyReading, setMarkAsCurrentlyReading] = useState(false);
 
   const [isBacklogPage, setIsBacklogPage] = useState(false);
   const [isCtlyReadingPage, setIsCtlyReadingPage] = useState(false);
   const [isFinishedPage, setIsFinishedPage] = useState(false);
-  
+
 
 
   const form = useForm({
@@ -85,7 +85,7 @@ const UpdateMango = ({ mango }) => {
 
     },
     inputs: {
-      maxWidth: '500px',
+      maxWidth: '20em',
       width: '100%',
       input: {
         height: 'auto',
@@ -157,7 +157,7 @@ const UpdateMango = ({ mango }) => {
       if (values.remarks) {
         mango.remarks = values.remarks;
       }
-      if(isBacklogPage){
+      if (isBacklogPage) {
         mango.lastChapterRead = 1;
       }
       return mango;
@@ -191,7 +191,9 @@ const UpdateMango = ({ mango }) => {
   return (
     <div
       style={{
-        maxWidth: '700px',
+        width: '70em',
+        // height: 'auto',
+        height: '20em'
       }}
     >
       {/*position relative for form to enable LoadingOverlay to work nicely*/}
@@ -239,28 +241,37 @@ const UpdateMango = ({ mango }) => {
             {/* CURRENTLY READING */}
             {tab === UPDATE && isCtlyReadingPage &&
               <>
-                <Center>
-                  <NumberInput className={classes.inputs} min={lastChapterRead} max={!finalChapter ? lastChapterRead + 1000 : finalChapter} required variant='default' label="Last chapter read" mb="20" size={isTablet?"lg":"md"}
+                <Group position='center'>
+                  <NumberInput className={classes.inputs} min={lastChapterRead} max={!finalChapter ? lastChapterRead + 1000 : finalChapter} required variant='default' label="Last chapter read" mb="20" size={isTablet ? "xl" : "md"}
                     {...form.getInputProps('lastChapterRead')} />
-                </Center>
+                  <Checkbox
+                    checked={markAsFinished}
+                    onChange={(event) => setMarkAsFinished(event.currentTarget.checked)}
+                    label="Mark as finished"
+                  />
+                  <Center><Button disabled={isBacklogPage && !markAsCurrentlyReading} size="sm" type="submit" rightIcon={<FaDatabase size={15} />}>SAVE</Button></Center>
+                </Group>
               </>
             }
             {/* REUSED FOR FINISHED */}
             {tab === UPDATE && markAsFinished && !isMobile &&
-              <Center>
-                <Textarea
-                  className={classes.inputs}
-                  label="Remarks"
-                  maxRows={5}
-                  size='md'
-                  variant='default'
-                  placeholder={mango.remarks ? mango.remarks : ''}
-                  {...form.getInputProps('remarks')}
-                />
-              </Center>
+              <>
+                <Center>
+                  <Textarea
+                    className={classes.inputs}
+                    label="Remarks"
+                    maxRows={5}
+                    size='md'
+                    variant='default'
+                    placeholder={mango.remarks ? mango.remarks : ''}
+                    {...form.getInputProps('remarks')}
+                  />
+                </Center>
+                <Space h="md" />
+              </>
             }
             {/* REUSED FOR FINISHED */}
-            {tab === UPDATE && isCtlyReadingPage &&
+            {/* {tab === UPDATE && isCtlyReadingPage &&
               <>
                 <Space h="md" />
 
@@ -271,7 +282,7 @@ const UpdateMango = ({ mango }) => {
                     label="Mark as finished"
                   /></Center>
               </>
-            }
+            } */}
             {tab === UPDATE && isBacklogPage &&
               <>
                 <Space h="md" />
@@ -289,12 +300,12 @@ const UpdateMango = ({ mango }) => {
                 <Space h="md" />
               </>
             }
-            {tab !== INFO &&
+            {/* {tab !== INFO &&
               <>
                 <Space h="md" />
                 <Center><Button disabled={isBacklogPage && !markAsCurrentlyReading} size="sm" type="submit" rightIcon={<FaDatabase size={15} />}>SAVE</Button></Center>
               </>
-            }
+            } */}
           </Paper>
         }
       </form>
