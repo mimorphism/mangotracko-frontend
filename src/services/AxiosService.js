@@ -20,8 +20,8 @@ class AxiosService {
     }
 }
 
-const resourceAxiosInstance = new AxiosService(process.env.REACT_APP_BACKEND_BASE_URL+'/api/user'); 
-const authAxiosInstance = new AxiosService(process.env.REACT_APP_BACKEND_BASE_URL); 
+const resourceAxiosInstance = new AxiosService(process.env.REACT_APP_BACKEND_BASE_URL + '/api/user');
+const authAxiosInstance = new AxiosService(process.env.REACT_APP_BACKEND_BASE_URL);
 
 
 const AxiosInterceptor = ({ children }) => {
@@ -49,19 +49,19 @@ const AxiosInterceptor = ({ children }) => {
                             history.go(0);
                         }
                     }).catch((response) => {
-                        if (response.errorCode == 500) {
-                            dispatch({ type: 'LOGGED_OUT_SESSION_EXPIRED'});
+                        if (response.errorCode === 500) {
+                            dispatch({ type: 'LOGGED_OUT_SESSION_EXPIRED' });
                             TokenService.removeUser();
                             history.push('/login');
                         };
                     });
-                return new Promise(() => {});
+                return new Promise(() => { });
 
             }
 
 
             if (statusCode >= 500 || statusCode == null) {
-                dispatch({ type: 'LOGGED_OUT_SERVER_UNREACHABLE'});
+                dispatch({ type: 'LOGGED_OUT_SERVER_UNREACHABLE' });
                 TokenService.removeUser();
                 history.push('/login');
                 return Promise.reject({
@@ -71,10 +71,10 @@ const AxiosInterceptor = ({ children }) => {
             //logged out by another session
             if (statusCode === 403 &&
                 errorMsg[0] === `Authorization attempt with invalid access token! User:${TokenService.getUsername()}`) {
-                dispatch({ type: 'LOGGED_OUT_BY_ANOTHER_SESSION'});
+                dispatch({ type: 'LOGGED_OUT_BY_ANOTHER_SESSION' });
                 TokenService.removeUser();
                 history.push('/login');
-                return new Promise(() => {});
+                return new Promise(() => { });
             }
 
             if (statusCode === 400) {

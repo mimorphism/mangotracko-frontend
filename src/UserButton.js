@@ -1,4 +1,4 @@
-import { Menu, createStyles, UnstyledButton } from '@mantine/core';
+import { Menu, createStyles, UnstyledButton, Text } from '@mantine/core';
 import { FaUserAstronaut } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
@@ -9,6 +9,13 @@ const UserButton = ({ username, tryLogout }) => {
 
     texts: {
       fontSize: theme.fontSizes.sm,
+      fontWeight: '800',
+      [`@media (max-width: 1024px)`]: {
+        fontSize: theme.fontSizes.sm,
+      },
+    },
+    username: {
+      fontSize: theme.fontSizes.md,
       fontWeight: '800',
       [`@media (max-width: 1024px)`]: {
         fontSize: theme.fontSizes.sm,
@@ -39,18 +46,30 @@ const UserButton = ({ username, tryLogout }) => {
   const { classes } = useStyles();
 
   return (
-    <Menu position="bottom"
-      radius={0} size="xl" className={classes.texts}
+    <Menu position="bottom-end"
+      radius={0} size="xl"
+      className={classes.texts}
       trigger="hover" openDelay={100} closeDelay={100}>
       <Menu.Target>
         <div className={classes.userIcon}>
           <UnstyledButton
           ><FaUserAstronaut
-              color="white" size="2.5rem" /></UnstyledButton>
+              color="white" size="2.0rem" /></UnstyledButton>
         </div>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Label className={classes.texts}>User: {username}</Menu.Label>
+        <Menu.Label>
+          <Text
+            className={classes.username}
+            variant="gradient"
+            gradient={{ from: 'teal', to: 'blue', deg: 45 }}
+            ta="center"
+            size="md"
+            fw={800}
+          >
+            {username}
+          </Text>
+        </Menu.Label>
         <Menu.Divider />
         <Menu.Item className={classes.texts} component={Link} to="home">STATS</Menu.Item>
         <Menu.Item

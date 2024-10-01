@@ -144,9 +144,9 @@ const Header = ({ username }) => {
     container: {
       display: 'flex',
       justifyContent: 'space-between',
-      paddingBottom: theme.spacing.xs,
+      // paddingBottom: theme.spacing.xs,
       alignItems: 'center',
-      maxWidth:'1440px',
+      maxWidth: '1440px',
     },
 
   }));
@@ -159,54 +159,54 @@ const Header = ({ username }) => {
   const tryLogout = () => {
     AuthService.logout().then(() => {
       TokenService.removeUser();
-      notifyLoadingCallback('See you again '+ username, 'logout','Logout succesful!', false );
-  });
-  dispatch({ type: 'LOGGED_OUT' });
+      notifyLoadingCallback('See you again ' + username, 'logout', 'Logout succesful!', false);
+    });
+    dispatch({ type: 'LOGGED_OUT' });
 
-};
+  };
 
-return (
-  <div className={classes.header}>
-    {!matches &&
-    <MobileMenu username={username} tryLogout={tryLogout}></MobileMenu>
-    }
-    
-    
-    {matches &&
-      <Container className={classes.container}>
-        {/* <div className={classes.operationsList}> */}
-        <Center>
-        <Link to="search" className='headerLinkWrapper'
-        onClick={() => toggle({ type: 'SEARCH', value: true })}
-          >Search
-            <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.SEARCH })}></div>
-          </Link>
-          <Link to="backlog" className='headerLinkWrapper'
-            onClick={() => toggle({ type: 'BACKLOG', value: true })}
-          >Backlog
-            <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.BACKLOG })}></div>
-          </Link>
-          <Link to="finished" className='headerLinkWrapper'
-            onClick={() => toggle({ type: 'FINISHED', value: true })}
-          >Finished
-            <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.FINISHED })}></div>
-          </Link>
-          <Link to="currentlyreading" className='headerLinkWrapper'
-            onClick={() => toggle({ type: 'CTLY_READING', value: true })}
-          >Currently Reading
-            <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.CTLY_READING })}></div>
-          </Link>
+  return (
+    <div className={classes.header}>
+      {!matches &&
+        <MobileMenu username={username} tryLogout={tryLogout}></MobileMenu>
+      }
+
+
+      {matches &&
+        <Container className={classes.container}>
+          {/* <div className={classes.operationsList}> */}
+          <Center>
+            <Link to="search" className='headerLinkWrapper'
+              onClick={() => toggle({ type: 'SEARCH', value: true })}
+            >Search
+              <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.SEARCH })}></div>
+            </Link>
+            <Link to="backlog" className='headerLinkWrapper'
+              onClick={() => toggle({ type: 'BACKLOG', value: true })}
+            >Backlog
+              <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.BACKLOG })}></div>
+            </Link>
+            <Link to="finished" className='headerLinkWrapper'
+              onClick={() => toggle({ type: 'FINISHED', value: true })}
+            >Finished
+              <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.FINISHED })}></div>
+            </Link>
+            <Link to="currentlyreading" className='headerLinkWrapper'
+              onClick={() => toggle({ type: 'CTLY_READING', value: true })}
+            >Currently Reading
+              <div className={cx(classes.linkBar, { [classes.linkBarActive]: activePage.CTLY_READING })}></div>
+            </Link>
           </Center>
-          <Group 
-                spacing={0} position="right" noWrap>
-          <UserButton username={username} tryLogout={tryLogout} />
+          <Group
+            spacing={0} position="right" noWrap>
+            <UserButton username={username} tryLogout={tryLogout} />
           </Group>
-        {/* </div> */}
-      </Container>
-    }
+          {/* </div> */}
+        </Container>
+      }
 
-  </div>
-);
+    </div>
+  );
 }
 
 export default Header;

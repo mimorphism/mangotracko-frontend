@@ -1,5 +1,5 @@
 import FinishedMango from './FinishedMango';
-import { createStyles, LoadingOverlay, Pagination, Group, Text, UnstyledButton, Center } from '@mantine/core';
+import { createStyles, LoadingOverlay, Pagination, Group, Text, UnstyledButton, SegmentedControl, Space } from '@mantine/core';
 import useAxios from './useAxios';
 import { useState, useEffect } from 'react';
 import { FaSortAmountUpAlt, FaSortAmountDownAlt } from 'react-icons/fa';
@@ -13,18 +13,24 @@ const useStyles = createStyles(() => ({
   content: {
     display: 'grid',
     justifyContent: 'center',
-    gridTemplateColumns: 'repeat(auto-fit, 190px)',
-    padding: '2rem 2rem',
-    gap: '5em 5em',
-    overflow: 'auto',
-    [`@media (max-width: 1024px)`]: {
-      gridTemplateColumns: 'repeat(auto-fill,minmax(120px,1fr))',
-      rowGap: '3em',
+    gridTemplateColumns: 'repeat(auto-fit, 191px)',
+    padding: '1.5rem 0',
+    gap: '6em 5em',
+    width: '100%',
+    // overflow: 'auto',
+    [`@media (max-width: 1440px)`]: {
+      gridTemplateColumns: 'repeat(auto-fill,minmax(135px,1fr))',
+      // rowGap: '3em',
 
     },
-    [`@media (max-width: 395px)`]: {
-      gridTemplateColumns: 'repeat(auto-fill,minmax(120px,1fr))',
-      rowGap: '3em',
+    [`@media (max-width: 1024px)`]: {
+      gridTemplateColumns: 'repeat(auto-fill,minmax(145px,1fr))',
+      //  rowGap: '3em',
+
+    },
+    [`@media (max-width: 425px)`]: {
+      gridTemplateColumns: 'repeat(auto-fill,minmax(135px,1fr))',
+      // rowGap: '3em',
     },
   },
 
@@ -33,14 +39,31 @@ const useStyles = createStyles(() => ({
     size: 'xl',
     variant: 'bars'
   },
+  container: {
+    padding: '1rem 5rem',
+    minHeight: '1600px',
+    position: 'relative',
+    [`@media (max-width: 1024px)`]: {
+      padding: '0',
+    },
+  },
+  sorting: {
+    gap: "1em",
+
+  },
   sortBtn: {
     // border: `3px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]}`,
-    border: `3px solid white`,
+    border: `2px solid white`,
     borderRadius: '23px',
-    width: '115px',
+    paddingLeft: '0.5em',
+    paddingRight: '0.5em',
+    width: 'auto',
     cursor: 'pointer'
+  },
+  pagination: {
+    position: 'relative',
+    top: '4em',
   }
-
 
 }));
 
@@ -92,23 +115,49 @@ const FinishedReading = () => {
           size: '200', variant: 'bars'
 
         }} visible={isPending} />
-      <Group pr="sm" pt="sm" position="right" spacing={0}>
-        <UnstyledButton pt="3px" onClick={() => toggleSortDir()}>
-          {sortDir === 'asc' ? <FaSortAmountUpAlt size="28px" color="white" /> : <FaSortAmountDownAlt size="28px" color="white" />}
-        </UnstyledButton>
-        <Center>
-          <div className={classes.sortBtn}
-            onClick={() => sortBy === SORT_BY_LASTACTIVITY ? setSortBy(SORT_BY_TITLE) : setSortBy(SORT_BY_LASTACTIVITY)}>
-            <Text style={{whiteSpace:'nowrap'}} align="center" size="md" weight={800}>{sortBy === SORT_BY_LASTACTIVITY ? 'Date Finished' : 'Title'}</Text></div>
-        </Center>
-      </Group>
-      <div className={classes.content}>
-        {sortedMangoes &&
-          sortedMangoes.map(mango => (
-            <FinishedMango key={mango.mango.mangoId} mango={mango} />
-          ))}
+      <Space h="xl"></Space>
+      <div className={classes.container}>
+        <Group className={classes.sorting} position="right" spacing={0}>
+          <UnstyledButton pt="3px" onClick={() => toggleSortDir()}>
+            {sortDir === 'asc' ? <FaSortAmountUpAlt size="1.5em" color="white" /> : <FaSortAmountDownAlt size="1.5em" color="white" />}
+          </UnstyledButton>
+          <SegmentedControl
+            radius='xs'
+            color='gray'
+            value={sortBy}
+            onChange={setSortBy}
+            size="sm"
+            data={[
+              {
+                label: (<Text
+                  weight={800}
+                  size="xs">
+                  DATE FINISHED
+                </Text>), value: SORT_BY_LASTACTIVITY
+              },
+              {
+                label: (<Text
+                  weight={800}
+                  size="xs">
+                  TITLE
+                </Text>),
+                value: SORT_BY_TITLE,
+              }
+            ]}
+          />
+        </Group>
+        <div className={classes.content}>
+          {sortedMangoes &&
+            sortedMangoes.map(mango => (
+              <FinishedMango key={mango.mango.mangoId} mango={mango} />
+            ))}
+        </div>
       </div>
-      {totalPages > 1 && <Pagination position="center" align="center" page={currentPage} onChange={setCurrentPage} total={totalPages} />}
+      <div className={classes.pagination}>
+        {totalPages > 1 && <Pagination position='center' align='center' page={currentPage} onChange={setCurrentPage} total={totalPages} />}
+
+      </div>
+
     </div>
   );
 
