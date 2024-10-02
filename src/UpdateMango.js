@@ -7,16 +7,11 @@ import {
   Center,
   LoadingOverlay,
   Textarea,
-  SegmentedControl,
   Divider,
   Text,
   Checkbox,
   Group,
-  Collapse,
-  Popover,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-
 import { Image as MantineImage } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { createStyles } from "@mantine/core";
@@ -44,12 +39,7 @@ const UpdateMango = ({ mango }) => {
   const [submittingFinished, setSubmittingFinished] = useState(false);
   const history = useHistory();
   const [finalChapter, setFinalChapter] = useState(0);
-  const isMobile = useMediaQuery("(max-width: 56.25em)");
-  const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1024px)");
-  const INFO = "INFO";
-  const UPDATE = "UPDATE";
-  const [tab, setTab] = useState(INFO);
-
+  const isMobile = useMediaQuery("(max-width: 800px)");
   const [markAsFinished, setMarkAsFinished] = useState(false);
 
   const [isBacklogPage, setIsBacklogPage] = useState(false);
@@ -86,13 +76,13 @@ const UpdateMango = ({ mango }) => {
       color: theme.colors.dark[0],
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSizes.lg,
-      marginTop: "0.5em",
+      // marginTop: "0.5em",
       // position:'absolute',
       // top: '50%',
       // left: '50%',
       // transform: 'translate(-50%, -50%)',
       // msTransform: 'translate(-50%, -50%)',
-      [`@media (min-width: 500px)`]: {
+      [`@media (min-width: 800px)`]: {
         // display:'flex'
       },
     },
@@ -113,16 +103,10 @@ const UpdateMango = ({ mango }) => {
           ? theme.colors.dark[5]
           : theme.colors.gray[0],
       color: theme.colors.dark[0],
-      // maxWidth: "50em",
-      // maxWidth: "50em",
-      // minWidth: "25em",
-      width: "50em",
-      overflow: "hidden",
-      height: "30em",
-      overflow: "visible",
-      //paddingBottom: "2em",
-      // minHeight: "10em",
-      // maxHeight: "40em",
+      width: "auto",
+      maxWidth: "50em",
+      height: "auto",
+      maxHeight: "40em",
     },
     paperDivNoImage: {
       backgroundColor:
@@ -131,9 +115,10 @@ const UpdateMango = ({ mango }) => {
           : theme.colors.gray[0],
       color: theme.colors.dark[0],
 
-      width: "25em",
-      overflow: "hidden",
-      height: "21em",
+      width: "auto",
+      maxWidth: "25em",
+      height: "auto",
+      maxHeight: "40em",
     },
     chapterInput: {
       display: "flex",
@@ -265,28 +250,21 @@ const UpdateMango = ({ mango }) => {
     );
   }
 
-  function PlaceHolder() {
-    return (
-      <MantineImage withPlaceholder width="100%" height="25em" src={null} />
-    );
-  }
-
   return (
-    <div className={bannerImg ? classes.paperDiv : classes.paperDivNoImage}>
+    <div
+      className={
+        bannerImg && !isMobile ? classes.paperDiv : classes.paperDivNoImage
+      }
+    >
       {/*position relative for form to enable LoadingOverlay to work nicely*/}
       <form
         style={{ position: "relative", margin: 0 }}
         onSubmit={form.onSubmit((values) => submitMangoUpdate(values))}
       >
         <LoadingOverlay visible={isSubmitting} />
-        {
-          bannerImg && (
-            <MantineImage width="100%" height="200px" src={bannerImg} />
-          )
-          // : (
-          //   !isMobile && <PlaceHolder />
-          // )
-        }
+        {bannerImg && !isMobile && (
+          <MantineImage width="100%" height="300px" src={bannerImg} />
+        )}
         {!submittingFinished && (
           <Paper p={bannerImg && !isMobile ? 0 : "sm"} className={classes.Form}>
             <Center>
@@ -300,42 +278,14 @@ const UpdateMango = ({ mango }) => {
               </Text>
             </Center>
             <Space h="sm" />
-            <Center>
-              <SegmentedControl
-                radius="xs"
-                color="gray"
-                value={tab}
-                onChange={setTab}
-                size="sm"
-                data={[
-                  {
-                    label: (
-                      <Text weight={800} size="xs">
-                        INFO
-                      </Text>
-                    ),
-                    value: INFO,
-                  },
-                  {
-                    label: (
-                      <Text weight={800} size="xs">
-                        UPDATE
-                      </Text>
-                    ),
-                    value: UPDATE,
-                  },
-                ]}
-              />
-            </Center>
-            <Divider my="sm" />
-            {tab === INFO && (
-              <MangoLatestStatus
-                mango={mango}
-                setFinalChapter={setFinalChapter}
-              />
-            )}
-            {tab === UPDATE && isCtlyReadingPage && (
-              <Collapse in={tab === UPDATE && isCtlyReadingPage}>
+            <MangoLatestStatus
+              mango={mango}
+              setFinalChapter={setFinalChapter}
+            />
+            <Space h="xs" />
+            <Divider my="xs" />
+            {isCtlyReadingPage && (
+              <>
                 <ChapterInput
                   min={lastChapterRead}
                   max={!finalChapter ? lastChapterRead + 1000 : finalChapter}
@@ -365,10 +315,11 @@ const UpdateMango = ({ mango }) => {
                   </Button>
                 </Center>
                 <Space h="xs" />
-              </Collapse>
+              </>
             )}
-            {tab === UPDATE && markAsFinished && !isMobile && (
-              <Collapse in={tab === UPDATE && markAsFinished && !isMobile}>
+
+            {markAsFinished && (
+              <>
                 <Center>
                   <Textarea
                     style={{
@@ -376,7 +327,7 @@ const UpdateMango = ({ mango }) => {
                     }}
                     label="Remarks"
                     minRows={4}
-                    size="md"
+                    size="sm"
                     variant="default"
                     placeholder={mango.remarks ? mango.remarks : ""}
                     {...form.getInputProps("remarks")}
@@ -393,12 +344,11 @@ const UpdateMango = ({ mango }) => {
                     SAVE
                   </Button>
                 </Center>
-
                 <Space h="xs" />
-              </Collapse>
+              </>
             )}
-            {tab === UPDATE && isBacklogPage && (
-              <Collapse in={tab === UPDATE && isBacklogPage}>
+            {isBacklogPage && (
+              <>
                 <ChapterInput
                   min={1}
                   max={20000} //max theoretical chapter count in the whole universe
@@ -418,7 +368,7 @@ const UpdateMango = ({ mango }) => {
                   </Button>
                 </Center>
                 <Space h="xs" />
-              </Collapse>
+              </>
             )}
           </Paper>
         )}
