@@ -1,17 +1,9 @@
-import {
-  Badge,
-  Group,
-  createStyles,
-  Modal,
-  Blockquote,
-  Stack,
-} from "@mantine/core";
-import { useHover } from "@mantine/hooks";
+import { Badge, Group, createStyles, Modal, Blockquote } from "@mantine/core";
 import { gql, useQuery } from "@apollo/client";
 import { LoadingOverlay } from "@mantine/core";
 import { formatDistance } from "date-fns";
 import parseIso from "date-fns/parseISO";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { resourceAxiosInstance } from "./services/AxiosService";
 import AuthHeader from "./util/authHeaderHelper";
 import { getPrettifiedDate } from "./util/utils";
@@ -20,11 +12,12 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
   const title = mango.mango.mangoTitle;
   const anilistId = mango.mango.anilistId;
   const [openRemarks, setOpenRemarks] = useState(false);
+  const [genres, setGenres] = useState("");
 
   const useStyles = createStyles((theme) => ({
     statusBadgeGroup: {
       alignItems: "center",
-      [`@media (min-width: 768px) and (max-width: 1024px)`]: {
+      [`@media (max-width: 800px)`]: {
         justifyContent: "left",
         flexDirection: "column",
       },
@@ -76,6 +69,7 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
         }
         status
         chapters
+        genres
       }
     }
   `;
@@ -95,6 +89,12 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
           headers: AuthHeader.getAuthHeader(),
         });
       }
+      if (data.Media.genres) {
+        let genreStr = "";
+        genreStr += data.Media.genres.map((genre) => genre).join(", ");
+        genreStr += "";
+        setGenres(genreStr);
+      }
     }
   }, [data]);
 
@@ -105,7 +105,7 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
         visible={loading}
       />
       {!loading && (
-        <Stack position="center" className={classes.statusBadgeGroup}>
+        <Group position="center" className={classes.statusBadgeGroup}>
           <Badge
             color="gray"
             variant="outline"
@@ -185,6 +185,15 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
             size="lg"
             radius="xs"
           >{`AUTHORED BY ${mango.mango.author}`}</Badge>
+          <Badge
+            color="gray"
+            variant="outline"
+            style={{ display: "inline-table" }}
+            size="lg"
+            radius="xs"
+          >
+            {genres}
+          </Badge>
 
           {mango.remarks && (
             <Badge
@@ -198,7 +207,7 @@ const MangoLatestStatus = ({ mango, setFinalChapter }) => {
               SHOW REMARKS
             </Badge>
           )}
-        </Stack>
+        </Group>
       )}
 
       {
